@@ -59,24 +59,23 @@ def detect_cars_inside_image(image_np):
     return len(indices)
     
 class MessageHeader:
-    data_type_format = "BH?Q"
-    def __init__(self, message_type, message_id, has_priority, message_size):
+    data_type_format = "BHQ"
+    def __init__(self, message_type, message_id, message_size):
         self.message_type = message_type
         self.message_id = message_id
-        self.has_priority = has_priority
         self.message_size = message_size
         
     def pack(self):
-        return struct.pack(MessageHeader.data_type_format, self.message_type, self.message_id, self.has_priority, self.message_size)
+        return struct.pack(MessageHeader.data_type_format, self.message_type, self.message_id, self.message_size)
     
     @classmethod
     def unpack(cls, data):
-        message_type, message_id, has_priority, message_size = struct.unpack(MessageHeader.data_type_format, data)
-        return cls(message_type, message_id, has_priority, message_size)
+        message_type, message_id, message_size = struct.unpack(MessageHeader.data_type_format, data)
+        return cls(message_type, message_id, message_size)
         
     def __str__(self):
         return f"MessageHeader(message_type: {self.message_type}, message_id: {self.message_id}, \
-        has_priority: {self.has_priority}, message_size: {self.message_size})"
+        message_size: {self.message_size})"
 
 def read_data(conn, bytes_to_read):
     received_bytes = 0
