@@ -118,6 +118,10 @@ def main():
     input_file = args.input
     output_file = args.output
     
+    if input_file == None:
+        print("No input file provided, quiting")
+        exit(5)
+    
     if os.path.exists(input_file):
         #convert to absolute path
         input_file = os.path.abspath(input_file)
