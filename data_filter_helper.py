@@ -5,11 +5,33 @@ import tkinter as tk
 import csv
 import argparse
 
-DISEASES_TYPES = ["Laryngitis", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "none"]
+DISEASES_TYPES = ["pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "none", "inconcludent", "quit"]
 
 image_to_disease_data = [
-    ["Path", "Disease"]
+
 ]
+
+validated_images = set()
+
+def load_already_validated_images(csv_file_path):
+    # Open the CSV file and read the values from the first column
+    try:
+        with open(csv_file_path, 'r') as file:
+            csv_reader = csv.reader(file)
+            cnt = 0
+            for row in csv_reader:
+                # Assuming the first column contains the values you want to insert into the set
+                cnt+=1
+                validated_images.add(row[0])
+                
+            if cnt == 0:
+                image_to_disease_data.append(["Path", "Disease"])
+    except FileNotFoundError:
+        print(f"The file {csv_file_path} does not exist, creating it")
+        image_to_disease_data.append(["Path", "Disease"])
+        with open(csv_file_path, mode="w", newline="") as csv_file:
+            csv_writer = csv.writer(csv_file)
+
 
 def center_window(root, photo_height, photo_width):
     # Calculate the screen dimensions
@@ -25,12 +47,16 @@ def center_window(root, photo_height, photo_width):
     # Set the window geometry
     root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
     
-def display_image_and_wait_for_choice(file_path, photo_height, photo_width):
+def display_image_and_wait_for_choice(file_path, photo_height, photo_width, output_file):
     # Check if the image file exists
     if os.path.exists(file_path):
 
         file_path = os.path.abspath(file_path)
         # Open the image using PIL
+        if file_path in validated_images:
+            print(f"File {file_path} already validated")
+            return
+        
         img = Image.open(file_path)
         
         root = tk.Tk()
@@ -45,11 +71,17 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width):
         
         def on_button_click(option, file_path):
             print(f"Option {option} selected")
-            image_to_disease_data.append([file_path, option])
+            
+            if option == "quit":
+                save_data_to_csv(output_file)
+                exit(0)
+
+            if option != "inconcludent":
+                image_to_disease_data.append([file_path, option])
             root.destroy()  # Close the tkinter window when an option is selected
     
         button_width = 40  # Adjust the button width
-        button_height = 2  # Adjust the button height
+        button_height = 1  # Adjust the button height
 
         print(button_height)
         for option in DISEASES_TYPES:
@@ -65,12 +97,12 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width):
     else:
         print(f"Image file not found {file_path}.")
 
-def parse_coco_json(coco_json_path):
+def parse_coco_json(coco_json_path, output_file):
     with open(coco_json_path, 'r') as file:
         data = json.load(file)
         
         for elem in data["images"]:
-            display_image_and_wait_for_choice(elem["file_name"], elem["height"], elem["width"])
+            display_image_and_wait_for_choice(elem["file_name"], elem["height"], elem["width"], output_file)
 
 
 def remove_duplicates(input_path):
@@ -138,8 +170,10 @@ def main():
     else:
         print(f"Can't find {input_file}")
         exit(5)
-        
-    parse_coco_json(input_file)
+    
+    load_already_validated_images(output_file)
+    
+    parse_coco_json(input_file, output_file)
     
     save_data_to_csv(output_file)
 
