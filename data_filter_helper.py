@@ -78,6 +78,12 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width, outp
 
             if option != "inconcludent":
                 image_to_disease_data.append([file_path, option])
+            else:
+                try:
+                    os.remove(file_path)
+                except OSError as e:
+                    print(f"Error deleting '{file_path}': {e}")
+
             root.destroy()  # Close the tkinter window when an option is selected
     
         button_width = 40  # Adjust the button width
