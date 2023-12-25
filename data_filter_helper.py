@@ -135,6 +135,9 @@ def remove_duplicates(input_path):
             csv_writer.writerow(row_tuple)
 
 def save_data_to_csv(csv_file_path):
+
+    print(f"Saving file to: {csv_file_path}")
+
     try:
         with open(csv_file_path, mode="a", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -160,6 +163,8 @@ def main():
     if input_file == None:
         print("No input file provided, quiting")
         exit(5)
+    
+    output_file  = os.path.abspath(output_file)
     
     if os.path.exists(input_file):
         #convert to absolute path
