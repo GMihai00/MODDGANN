@@ -39,8 +39,8 @@ def center_window(root, photo_height, photo_width):
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     
-    window_width = photo_width 
-    window_height = photo_height + 250
+    window_width = photo_width + 400
+    window_height = photo_height + 550
     # Calculate the window position for centering
     x_position = (screen_width - window_width) // 2
     y_position = (screen_height - window_height) // 2
@@ -59,6 +59,7 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width, outp
             return
         
         img = Image.open(file_path)
+        img = img.resize((500, 500))
         
         root = tk.Tk()
         root.title("Image Viewer")
