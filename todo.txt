@@ -1,0 +1,4 @@
+-data augmentation
+-model design
+-reevaluate images by expert
+-collect more images so have equal amount for each disease

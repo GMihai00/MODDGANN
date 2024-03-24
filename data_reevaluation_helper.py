@@ -6,7 +6,7 @@ import csv
 import argparse
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
-DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "none", "quit"]
+DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "healthy", "quit"]
 
 old_image_to_disease_data = [
 
@@ -17,6 +17,7 @@ image_to_disease_data = [
 ]
 
 validated_images = set()
+
 
 def load_already_validated_images(csv_file_path):
     # Open the CSV file and read the values from the first column
@@ -36,7 +37,15 @@ def load_already_validated_images(csv_file_path):
         image_to_disease_data.append(["Path", "Disease"])
         with open(csv_file_path, mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
-            
+      
+image_per_disease = {
+    "pharyngitis" : 0,
+    "tonsillitis": 0,
+    "gastric reflux": 0,
+    "tonsil stones": 0,
+    "healthy" : 0
+}
+
 def load_classified_images(csv_file_path):
     try:
         with open(csv_file_path, 'r') as file:
@@ -47,6 +56,7 @@ def load_classified_images(csv_file_path):
                 # Assuming the first column contains the values you want to insert into the set
                 
                 old_image_to_disease_data.append([row[0], row[1]])
+                image_per_disease[row[1]]+=1
 
     except Exception as err:
         print(err)
@@ -111,7 +121,6 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
         button_width = 40  # Adjust the button width
         button_height = 1  # Adjust the button height
 
-        print(button_height)
         for option in DISEASES_TYPES:
             button = tk.Button(root, 
                 text=f"{option}", 
@@ -125,6 +134,10 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
     else:
         print(f"Image file not found {file_path}.")
 
+
+def summarize_dataset():
+    for key, value in image_per_disease.items():
+        print(f"Samples {key}: {value} images")
 
 
 def display_validated_data(output_file):
@@ -185,7 +198,7 @@ def main():
     output_file = args.output
     
     if input_file == None:
-        print("No input file provided, quiting")
+        print("No input file provided, quitting")
         exit(5)
     
     output_file  = os.path.abspath(output_file)
@@ -208,6 +221,8 @@ def main():
         exit(5)
     
     load_classified_images(input_file)
+    
+    summarize_dataset()
     
     load_already_validated_images(output_file)
     
