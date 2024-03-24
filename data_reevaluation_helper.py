@@ -6,10 +6,14 @@ import csv
 import argparse
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
-DISEASES_TYPES = ["pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "none", "inconcludent", "quit"]
+DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "none", "quit"]
+
+old_image_to_disease_data = [
+
+]
 
 image_to_disease_data = [
-
+    
 ]
 
 validated_images = set()
@@ -32,7 +36,22 @@ def load_already_validated_images(csv_file_path):
         image_to_disease_data.append(["Path", "Disease"])
         with open(csv_file_path, mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
+            
+def load_classified_images(csv_file_path):
+    try:
+        with open(csv_file_path, 'r') as file:
+            csv_reader = csv.reader(file)
+            # skip column definition row
+            next(csv_reader) 
+            for row in csv_reader:
+                # Assuming the first column contains the values you want to insert into the set
+                
+                old_image_to_disease_data.append([row[0], row[1]])
 
+    except Exception as err:
+        print(err)
+        exit(5)
+    
 
 def center_window(root, photo_height, photo_width):
     # Calculate the screen dimensions
@@ -48,15 +67,16 @@ def center_window(root, photo_height, photo_width):
     # Set the window geometry
     root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
     
-def display_image_and_wait_for_choice(file_path, photo_height, photo_width, output_file):
+def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
     # Check if the image file exists
     if os.path.exists(file_path):
 
         file_path = os.path.abspath(file_path)
-        # Open the image using PIL
+        
         if file_path in validated_images:
             print(f"File {file_path} already validated")
             return
+        
         
         img = Image.open(file_path)
         img = img.resize((500, 500))
@@ -71,20 +91,20 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width, outp
         label = tk.Label(root, image=img_tk)
         label.pack()
         
-        def on_button_click(option, file_path):
+        text_label = tk.Label(root, text=f"Classified before as: {initial_disease}",  font=("Helvetica", 20))
+        text_label.pack()
+        
+        def on_button_click(option, file_path, initial_disease):
             print(f"Option {option} selected")
             
             if option == "quit":
                 save_data_to_csv(output_file)
                 exit(0)
 
-            if option != "inconcludent":
+            if option != "OK":
                 image_to_disease_data.append([file_path, option])
             else:
-                try:
-                    os.remove(file_path)
-                except OSError as e:
-                    print(f"Error deleting '{file_path}': {e}")
+                image_to_disease_data.append([file_path, initial_disease])
 
             root.destroy()  # Close the tkinter window when an option is selected
     
@@ -97,7 +117,7 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width, outp
                 text=f"{option}", 
                 width=button_width,
                 height=button_height,
-                command=lambda option=option, file_path=file_path: on_button_click(option, file_path))
+                command=lambda option=option, file_path=file_path, initial_disease=initial_disease: on_button_click(option, file_path, initial_disease))
             button.pack()
     
         # Start the tkinter main loop to display the image and buttons
@@ -105,12 +125,11 @@ def display_image_and_wait_for_choice(file_path, photo_height, photo_width, outp
     else:
         print(f"Image file not found {file_path}.")
 
-def parse_coco_json(coco_json_path, output_file):
-    with open(coco_json_path, 'r') as file:
-        data = json.load(file)
-        
-        for elem in data["images"]:
-            display_image_and_wait_for_choice(elem["file_name"], elem["height"], elem["width"], output_file)
+
+
+def display_validated_data(output_file):
+    for key, value in old_image_to_disease_data:
+        display_image_and_wait_for_choice(key, value, output_file);
 
 
 def remove_duplicates(input_path):
@@ -136,13 +155,17 @@ def remove_duplicates(input_path):
             csv_writer.writerow(row_tuple)
 
 def save_data_to_csv(csv_file_path):
-
     print(f"Saving file to: {csv_file_path}")
 
+    existed_before = os.path.exists(csv_file_path)
+    
     try:
         with open(csv_file_path, mode="a", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
         
+            if not existed_before:
+                csv_writer.writerow(["Path", "Disease"])
+                
             csv_writer.writerows(image_to_disease_data)
         
         remove_duplicates(csv_file_path)
@@ -153,8 +176,8 @@ def save_data_to_csv(csv_file_path):
 def main():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("--input", type=str, help="Coco json input file path")
-    parser.add_argument("--output", type=str, help="Csv output file path", default="data.csv")
+    parser.add_argument("--input", type=str, help="Csv with validated data")
+    parser.add_argument("--output", type=str, help="Csv output file path", default="data_reevaluated.csv")
     
     args = parser.parse_args()
     
@@ -184,9 +207,11 @@ def main():
         print(f"Can't find {input_file}")
         exit(5)
     
+    load_classified_images(input_file)
+    
     load_already_validated_images(output_file)
     
-    parse_coco_json(input_file, output_file)
+    display_validated_data(output_file)
     
     save_data_to_csv(output_file)
 
