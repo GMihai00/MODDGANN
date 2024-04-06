@@ -168,3 +168,5 @@ env
 
 #temporary saved model
 saved_model
+
+src/model/logs/*

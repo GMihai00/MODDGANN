@@ -8,6 +8,8 @@ import argparse
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
 DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "healthy", "quit"]
 
+
+
 old_image_to_disease_data = [
 
 ]
@@ -18,7 +20,12 @@ image_to_disease_data = [
 
 validated_images = set()
 
-
+def convert_path(path):
+    if os.name == 'posix':
+        return path.replace('\\', '/')
+    else:
+        return path
+        
 def load_already_validated_images(csv_file_path):
     # Open the CSV file and read the values from the first column
     try:
@@ -37,7 +44,7 @@ def load_already_validated_images(csv_file_path):
         image_to_disease_data.append(["Path", "Disease"])
         with open(csv_file_path, mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
-      
+
 image_per_disease = {
     "pharyngitis" : 0,
     "tonsillitis": 0,
@@ -55,7 +62,7 @@ def load_classified_images(csv_file_path):
             for row in csv_reader:
                 # Assuming the first column contains the values you want to insert into the set
                 
-                old_image_to_disease_data.append([row[0], row[1]])
+                old_image_to_disease_data.append([convert_path(row[0]), row[1]])
                 image_per_disease[row[1]]+=1
 
     except Exception as err:
@@ -87,7 +94,7 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
             print(f"File {file_path} already validated")
             return
         
-        
+        print(file_path)
         img = Image.open(file_path)
         img = img.resize((500, 500))
         
