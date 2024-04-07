@@ -12,6 +12,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import GRU, Dense, Dropout, LSTM, Conv2D, MaxPooling2D, Flatten, InputLayer
 from tensorflow.keras.metrics import RootMeanSquaredError
 import tensorflow as tf
+from tensorflow.keras.callbacks import Callback
 
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -36,6 +37,8 @@ DISEASE_TO_CATEGORY = {
     "healthy" : 4
 }
 
+DISEASES = list(DISEASE_TO_CATEGORY.keys())
+
 CLASS_NAMES = list(DISEASE_TO_CATEGORY.keys())
 
 NR_DISEASES = len(DISEASE_TO_CATEGORY)
@@ -55,7 +58,6 @@ def convert_image_to_bytes(image_path):
         if not IS_RGB:
             image = image.convert("L")
         
-        
         width, height = image.size
         
         if height != EXPECTED_PHOTO_HEIGHT or width != EXPECTED_PHOTO_WIDTH:
@@ -64,6 +66,7 @@ def convert_image_to_bytes(image_path):
             print(f"Initial size: {width}:{height}, target size: {EXPECTED_PHOTO_WIDTH}:{EXPECTED_PHOTO_HEIGHT}")
             image = image.resize((EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT), Image.Resampling.LANCZOS)
         
+        # normalize data
         image_array = np.array(image)
         
         return image_array.reshape(EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
@@ -83,6 +86,12 @@ def disease_classification_distribution(disease_type):
             arr.append(0)
             
     return arr
+
+def distribution_to_label(distribution):
+    
+    disease_index = np.argmax(distribution, axis=0)
+    
+    return DISEASES[disease_index]
 
 def read_data(file_path):
     
@@ -190,6 +199,32 @@ def plot_confusion_matrix(cm, class_names):
     plt.xlabel('Predicted label')
     return figure
 
+
+class ImagePredictionLogger(Callback):
+    def __init__(self, validation_data, log_dir, nr_epochs):
+        super(ImagePredictionLogger, self).__init__()
+        self.validation_data = validation_data
+        self.log_dir = log_dir
+        self.nr_epochs = nr_epochs
+        # self.model = model
+
+    def on_epoch_end(self, epoch, logs=None):
+        if epoch == self.nr_epochs - 1:
+            
+            images, labels = self.validation_data
+            
+            with tf.summary.create_file_writer(self.log_dir).as_default():
+                predictions = self.model.predict(images)
+            
+                for i in range(0, len(predictions)):
+                    # Log images and predictions to TensorBoard
+                    
+                    display_image = np.reshape(images[i], (-1, EXPECTED_PHOTO_WIDTH , EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1))
+                    
+                    tf.summary.image(f"Image_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(labels[i])}\n prediction: {distribution_to_label(predictions[i])}")
+                    # tf.summary.text(f"Label_{i}", distribution_to_label(labels[i]), step=epoch)
+                    # tf.summary.text(f"Prediction_{i}", distribution_to_label(predictions[i]), step=epoch)
+            
 def main():
     print(tf.config.list_physical_devices('GPU'))
     
@@ -197,13 +232,12 @@ def main():
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
     parser.add_argument("--model_name", type=str, help="Model name", default="my_model")
-    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=10)
+    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=1)
     parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
 
     args = parser.parse_args()
     
     input_data = args.input_data
-    model_name = args.model_name
     train_epochs = args.epochs
     
     if input_data == None:
@@ -218,44 +252,56 @@ def main():
 
     x_data, y_data = read_data(input_data)
     
+    log_dir = "logs/image/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        
+    # file_writer = tf.summary.create_file_writer(log_dir + '/img')
+
+    
+    # with file_writer.as_default():
+    #     images = np.reshape(x_data[10:50], (-1, EXPECTED_PHOTO_WIDTH , EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1))
+    #     tf.summary.image("40 Photos", images, max_outputs=25, step=0)
+        
+    # normalize data
+    
     x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=args.test_train_split, random_state=42)
+    
+    image_prediction_logger = ImagePredictionLogger((x_test, y_test), log_dir + "/prediction", train_epochs)
+        
+    x_train = x_train / 255
+    y_train = y_train / 255
     
     model = define_model()
     
     model.summary()
     
-    print(f"Input data shape: {x_train.shape} : {y_train.shape}")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True)
+    # file_writer_cm = tf.summary.create_file_writer(log_dir + '/cm')
     
-    log_dir = "logs/image/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    # def log_confusion_matrix(epoch, logs):
+    #     # Use the model to predict the values from the validation dataset.
+    #     test_pred_raw = model.predict(x_test)
+    #     test_pred = np.argmax(test_pred_raw, axis=1)
     
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True, write_images=True)
-    file_writer_cm = tf.summary.create_file_writer(log_dir + '/cm')
+    #     # Calculate the confusion matrix.
+    #     cm = sklearn.metrics.confusion_matrix(np.argmax(y_test, axis=1), test_pred)
+    #     # Log the confusion matrix as an image summary.
+    #     figure = plot_confusion_matrix(cm, class_names=CLASS_NAMES)
+    #     cm_image = plot_to_image(figure)
     
-    def log_confusion_matrix(epoch, logs):
-      # Use the model to predict the values from the validation dataset.
-      test_pred_raw = model.predict(x_test)
-      test_pred = np.argmax(test_pred_raw, axis=1)
+    #     # Log the confusion matrix as an image summary.
+    #     with file_writer_cm.as_default():
+    #         tf.summary.image("epoch_confusion_matrix", cm_image, step=epoch)
     
-      # Calculate the confusion matrix.
-      cm = sklearn.metrics.confusion_matrix(np.argmax(y_test, axis=1), test_pred)
-      # Log the confusion matrix as an image summary.
-      figure = plot_confusion_matrix(cm, class_names=CLASS_NAMES)
-      cm_image = plot_to_image(figure)
-    
-      # Log the confusion matrix as an image summary.
-      with file_writer_cm.as_default():
-        tf.summary.image("epoch_confusion_matrix", cm_image, step=epoch)
-    
-    # Define the per-epoch callback.
-    cm_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_confusion_matrix)
+    # # Define the per-epoch callback.
+    # cm_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_confusion_matrix)
 
     # problems here to see what is going on rn, maybe input dimensions are just wrong
-    model.fit(x_train, y_train, epochs=train_epochs, shuffle=True, validation_data=(x_test,  y_test), callbacks=[tensorboard_callback, cm_callback])
+    model.fit(x_train, y_train, epochs=train_epochs, shuffle=True, validation_data=(x_test,  y_test), callbacks=[image_prediction_logger, tensorboard_callback])
     
     # Evaluate neural network performance
     model.evaluate(x_test,  y_test, verbose=2)
 
-    save_model_weights(model)
+    #  save_model_weights(model)
 
 
 if __name__ == "__main__":
