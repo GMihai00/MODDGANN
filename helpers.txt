@@ -1,1 +1,3 @@
 tensorboard --logdir src/model/logs
+
+python data_reevaluation_helper.py --input data.csv --skip_reevaluation 1

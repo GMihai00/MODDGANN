@@ -6,9 +6,7 @@ import csv
 import argparse
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
-DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "healthy", "quit"]
-
-
+DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "healthy", "quit", "remove"]
 
 old_image_to_disease_data = [
 
@@ -118,10 +116,11 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
                 save_data_to_csv(output_file)
                 exit(0)
 
-            if option != "OK":
-                image_to_disease_data.append([file_path, option])
-            else:
-                image_to_disease_data.append([file_path, initial_disease])
+            if option != "remove":
+                if option != "OK":
+                    image_to_disease_data.append([file_path, option])
+                else:
+                    image_to_disease_data.append([file_path, initial_disease])
 
             root.destroy()  # Close the tkinter window when an option is selected
     
@@ -198,12 +197,13 @@ def main():
     
     parser.add_argument("--input", type=str, help="Csv with validated data")
     parser.add_argument("--output", type=str, help="Csv output file path", default="data_reevaluated.csv")
+    parser.add_argument("--skip_reevaluation", type=bool, help="If nothing apart from dataset details should be done", default=False)
     
     args = parser.parse_args()
     
     input_file = args.input
     output_file = args.output
-    
+    reevaluate = not args.skip_reevaluation
     if input_file == None:
         print("No input file provided, quitting")
         exit(5)
@@ -231,11 +231,12 @@ def main():
     
     summarize_dataset()
     
-    load_already_validated_images(output_file)
-    
-    display_validated_data(output_file)
-    
-    save_data_to_csv(output_file)
+    if reevaluate:
+        load_already_validated_images(output_file)
+        
+        display_validated_data(output_file)
+        
+        save_data_to_csv(output_file)
 
 if __name__ == "__main__":
     main()
