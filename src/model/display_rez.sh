@@ -1,0 +1,1 @@
+tensorboard --logdir ./src/model/logs

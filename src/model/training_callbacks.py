@@ -97,10 +97,11 @@ class ImagePredictionLogger(Callback):
             
             with tf.summary.create_file_writer(self.log_dir).as_default():
                 predictions = self.model.predict(images)
-            
+                
+                print(predictions[0])
                 for i in range(0, len(predictions)):
                     # Log images and predictions to TensorBoard
                     
                     display_image = np.reshape(images[i], (-1, self.expected_photo_width , self.expected_photo_height, 3 if self.rgb else 1))
                     
-                    tf.summary.image(f"Image_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(labels[i])}\n prediction: {distribution_to_label(predictions[i])}")
+                    tf.summary.image(f"{distribution_to_label(labels[i])}_{distribution_to_label(predictions[i])}_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(labels[i])}\n prediction: {distribution_to_label(predictions[i])}")

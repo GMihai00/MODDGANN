@@ -1,15 +1,17 @@
 import os
 import numpy as np
 import csv
+from sklearn.utils import shuffle
 
 from PIL import Image
+
+from sklearn.model_selection import train_test_split
 
 DISEASE_TO_CATEGORY = {
     "pharyngitis": 0,
     "tonsillitis": 1,
-    "gastric reflux": 2,
-    "tonsil stones": 3,
-    "healthy" : 4
+    "tonsil stones": 2,
+    "healthy" : 3
 }
 
 DISEASES = list(DISEASE_TO_CATEGORY.keys())
@@ -43,6 +45,8 @@ def convert_image_to_bytes(image_path, expected_photo_height, expected_photo_wid
         # normalize data
         image_array = np.array(image)
         
+        image.close()
+        
         return image_array.reshape(expected_photo_width, expected_photo_height, 3 if rgb else 1)
         
     except Exception as e:
@@ -66,11 +70,46 @@ def distribution_to_label(distribution):
     disease_index = np.argmax(distribution, axis=0)
     
     return DISEASES[disease_index]
+
+def balanced_data_split(data, test_train_split, random_state=42):
+    
+    x_train_final = []
+    y_train_final = []
+    x_test_final = []
+    y_test_final = []
+    
+    
+    for key, value in data.items():
+        x_data = value
+        y_data = []
+        
+        data = disease_classification_distribution(DISEASE_TO_CATEGORY[key])
+        
+        for _ in range(0, len(x_data)):
+            y_data.append(data)
+    
+        y_data = np.array(y_data)
+        
+        x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=test_train_split, random_state=random_state)
+        
+        x_test_final.extend(x_test)
+        y_test_final.extend(y_test)
+        x_train_final.extend(x_train)
+        y_train_final.extend(y_train)
+        
+        x_test_final, y_test_final = shuffle(x_test_final, y_test_final, random_state=random_state)
+        x_train_final, y_train_final = shuffle(x_train_final, y_train_final, random_state=random_state)
+        
+    return np.array(x_train_final), np.array(y_train_final), np.array(x_test_final), np.array(y_test_final)
     
 def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
     
-    x_data = []
-    y_data = []
+    data = {
+        "pharyngitis": [],
+        "tonsillitis": [],
+        "tonsil stones": [],
+        "healthy": []
+    }
     
     # Open the CSV file for reading
     with open(file_path, mode='r') as file:
@@ -85,10 +124,11 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
             if len(row) == 2:  # Ensure there are two columns in the row
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
-                
+                    
                 if len(image_bytes) != 0:
-                    x_data.append(image_bytes)
-                    y_data.append(disease_classification_distribution(DISEASE_TO_CATEGORY[disease]))
-                        
-
-    return (np.array(x_data), np.array(y_data))
+                    data[disease].append(image_bytes)
+                    
+    for key, value in data.items():
+        data[key] = np.array(value)
+        print(f"{key}: {len(data[key])}")
+    return data

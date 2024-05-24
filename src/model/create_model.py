@@ -5,41 +5,33 @@ import subprocess
 import datetime
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# to disable cuda
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout,Conv2D, MaxPooling2D, Flatten, InputLayer
 
-from sklearn.model_selection import train_test_split
+from training_callbacks import ImagePredictionLogger
 
 from data_processing_helpers import *
-from training_callbacks import ImagePredictionLogger
+import models
 
 EXPECTED_PHOTO_WIDTH = 320
 EXPECTED_PHOTO_HEIGHT = 320
 
-IS_RGB = False
+IS_RGB = True
 
 WEIGHTS_BACKUP = 'my_model.weights.h5'
 
-def define_model():
+def define_model(model_name):
 
     input_shape = (EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
-    model = Sequential()
-    model.add(InputLayer(shape=input_shape))
-    model.add(Conv2D(32, (3, 3), activation="gelu"))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(64, (3, 3), activation="gelu"))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Flatten())
-    model.add(Dense(128, activation="gelu"))
-    model.add(Dense(NR_DISEASES, activation="softmax"))
     
-    # Train neural network
+    model = getattr(models, model_name)(input_shape, NR_DISEASES)
+        
     model.compile(
         optimizer="adam",
-        loss="categorical_crossentropy",
-        metrics=["accuracy"]
+        loss='binary_crossentropy',
+        metrics=['precision', 'recall']
     )
     
     if os.path.isfile(WEIGHTS_BACKUP):
@@ -56,15 +48,14 @@ def save_model(model, model_name):
     
     model.save("saved_model/" + model_name)
 
-
 def main():
     print(tf.config.list_physical_devices('GPU'))
     
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
-    parser.add_argument("--model_name", type=str, help="Model name", default="my_model")
-    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=45)
+    parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
+    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=150)
     parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
 
@@ -73,6 +64,8 @@ def main():
     input_data = args.input_data
     train_epochs = args.epochs
     batch_size = args.batch_size
+    model_name = args.model_name
+    test_train_split = args.test_train_split
     
     if input_data == None:
         print("Missing train and test input, quitting")
@@ -83,34 +76,33 @@ def main():
         os.chdir("./src/model")
     except:
         pass
+    
+    data = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
+    
+    x_train, y_train, x_test, y_test = balanced_data_split(data, test_train_split)
+    print(f"Data size:{len(x_train) + len(x_test)}")
 
-    x_data, y_data = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
-    
-    log_dir = "logs/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    
-    x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=args.test_train_split, random_state=42)
+    log_dir = "logs/" + model_name + datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
     
     # create callbacks with unprocessed images
         
     train_callbacks = []
-    train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
+    # train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
     train_callbacks.append(ImagePredictionLogger((x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
-        
-    # normalize data
+
+    model = define_model(model_name)
+    
+    model.summary()
     
     x_train = x_train / 255
     x_test = x_test / 255
     
-    model = define_model()
-    
-    model.summary()
-
     model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_test,  y_test), callbacks=train_callbacks)
     
-    # Evaluate neural network performance
-    model.evaluate(x_test,  y_test, verbose=2)
-
     save_model_weights(model)
+    
+
+    model.evaluate(x_test,  y_test, verbose=2)
 
 
 if __name__ == "__main__":

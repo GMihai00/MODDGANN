@@ -6,7 +6,7 @@ import csv
 import argparse
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
-DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "gastric reflux", "tonsil stones", "healthy", "quit", "remove"]
+DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "tonsil stones", "healthy", "quit", "remove"]
 
 old_image_to_disease_data = [
 
@@ -46,7 +46,6 @@ def load_already_validated_images(csv_file_path):
 image_per_disease = {
     "pharyngitis" : 0,
     "tonsillitis": 0,
-    "gastric reflux": 0,
     "tonsil stones": 0,
     "healthy" : 0
 }
