@@ -15,8 +15,8 @@ from training_callbacks import ImagePredictionLogger
 from data_processing_helpers import *
 import models
 
-EXPECTED_PHOTO_WIDTH = 320
-EXPECTED_PHOTO_HEIGHT = 320
+EXPECTED_PHOTO_WIDTH = 160
+EXPECTED_PHOTO_HEIGHT = 160
 
 IS_RGB = True
 
@@ -28,10 +28,12 @@ def define_model(model_name):
     
     model = getattr(models, model_name)(input_shape, NR_DISEASES)
         
+    WEIGHTS_BACKUP  = model_name + ".weights.h5"
+    
     model.compile(
-        optimizer="adam",
+        optimizer='adam',
         loss='binary_crossentropy',
-        metrics=['precision', 'recall']
+        metrics=['acc']
     )
     
     if os.path.isfile(WEIGHTS_BACKUP):
@@ -55,7 +57,7 @@ def main():
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
     parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
-    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=150)
+    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=20)
     parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
 
