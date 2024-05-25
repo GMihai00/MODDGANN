@@ -20,8 +20,6 @@ EXPECTED_PHOTO_HEIGHT = 160
 
 IS_RGB = True
 
-WEIGHTS_BACKUP = 'my_model.weights.h5'
-
 def define_model(model_name):
 
     input_shape = (EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
@@ -41,7 +39,8 @@ def define_model(model_name):
     
     return model
 
-def save_model_weights(model):
+def save_model_weights(model, model_name):
+    WEIGHTS_BACKUP  = model_name + ".weights.h5"
     model.save_weights(WEIGHTS_BACKUP)
 
 def save_model(model, model_name):
@@ -57,8 +56,8 @@ def main():
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
     parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
-    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=20)
-    parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
+    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=100)
+    parser.add_argument("--batch_size", type=int, help="Batch size", default=30)
     parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
 
     args = parser.parse_args()
@@ -88,6 +87,9 @@ def main():
     
     # create callbacks with unprocessed images
         
+    x_train = x_train / 255
+    x_test = x_test / 255
+    
     train_callbacks = []
     # train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
     train_callbacks.append(ImagePredictionLogger((x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
@@ -96,12 +98,9 @@ def main():
     
     model.summary()
     
-    x_train = x_train / 255
-    x_test = x_test / 255
-    
     model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_test,  y_test), callbacks=train_callbacks)
     
-    save_model_weights(model)
+    save_model_weights(model, model_name)
     
 
     model.evaluate(x_test,  y_test, verbose=2)

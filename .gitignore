@@ -170,4 +170,4 @@ env
 saved_model
 
 src/model/logs/*
-src/model/my_model.weights.h5
+*.weights.h5

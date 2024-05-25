@@ -98,7 +98,6 @@ class ImagePredictionLogger(Callback):
             with tf.summary.create_file_writer(self.log_dir).as_default():
                 predictions = self.model.predict(images)
                 
-                print(predictions[0])
                 for i in range(0, len(predictions)):
                     # Log images and predictions to TensorBoard
                     
