@@ -103,4 +103,4 @@ class ImagePredictionLogger(Callback):
                     
                     display_image = np.reshape(images[i], (-1, self.expected_photo_width , self.expected_photo_height, 3 if self.rgb else 1))
                     
-                    tf.summary.image(f"{distribution_to_label(labels[i])}_{distribution_to_label(predictions[i])}_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(labels[i])}\n prediction: {distribution_to_label(predictions[i])}")
+                    tf.summary.image(f"v:{distribution_to_label(labels[i])}_p:{distribution_to_label(predictions[i])}_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(labels[i])}\n prediction: {distribution_to_label(predictions[i])}")

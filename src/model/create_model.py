@@ -56,8 +56,8 @@ def main():
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
     parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
-    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=100)
-    parser.add_argument("--batch_size", type=int, help="Batch size", default=30)
+    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=60)
+    parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
 
     args = parser.parse_args()
