@@ -375,3 +375,4 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-15-_JPG_jpg.rf.bafc567ea3efe45ce54a2af8ebd49d49.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-177-_JPG_jpg.rf.88485ab62f134e81c0e0291c3ebef178.jpg,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-9-_JPG_jpg.rf.c51a334026cf071f808a312ef992fbed.jpg,healthy
+/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/tonsilities/2.png,tonsillitis
