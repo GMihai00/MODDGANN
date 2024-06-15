@@ -30,8 +30,12 @@ def define_model(model_name):
     
     model.compile(
         optimizer='adam',
-        loss='binary_crossentropy',
-        metrics=['acc', tf.keras.metrics.Precision()]
+        loss='categorical_crossentropy',
+        metrics=[
+            'accuracy',
+            tf.keras.metrics.Precision(name='precision'),
+            tf.keras.metrics.Recall(name='recall')
+        ]
     )
     
     if os.path.isfile(WEIGHTS_BACKUP):
@@ -56,7 +60,7 @@ def main():
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
     parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
-    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=60)
+    parser.add_argument("--epochs", type=int, help="Number of training epochs", default=100)
     parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
 
@@ -80,8 +84,11 @@ def main():
     
     data = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
     
-    x_train, y_train, x_test, y_test = balanced_data_split(data, test_train_split)
-    print(f"Data size:{len(x_train) + len(x_test)}")
+    x_train, y_train, x_split, y_split = balanced_data_split(data, test_train_split)
+    
+    x_valid, x_test, y_valid, y_test = train_test_split(x_split, y_split, test_size=0.5, random_state=42)
+    
+    print(f"Data size:{len(x_train) + len(x_test) + len(x_valid)}")
 
     log_dir = "logs/" + model_name + datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
     
@@ -89,16 +96,17 @@ def main():
         
     x_train = x_train / 255
     x_test = x_test / 255
+    x_valid = x_valid / 255
     
     train_callbacks = []
-    # train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
+    train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
     train_callbacks.append(ImagePredictionLogger((x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
 
     model = define_model(model_name)
     
     model.summary()
     
-    model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_test,  y_test), callbacks=train_callbacks)
+    model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_valid,  y_valid), callbacks=train_callbacks)
     
     save_model_weights(model, model_name)
     

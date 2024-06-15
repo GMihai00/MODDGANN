@@ -10,8 +10,9 @@ from sklearn.model_selection import train_test_split
 DISEASE_TO_CATEGORY = {
     "pharyngitis": 0,
     "tonsillitis": 1,
-    "tonsil stones": 2,
-    "healthy" : 3
+    # "healthy" : 1
+    # "tonsil stones": 2,
+    # "healthy" : 3
 }
 
 DISEASES = list(DISEASE_TO_CATEGORY.keys())
@@ -107,8 +108,8 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
     data = {
         "pharyngitis": [],
         "tonsillitis": [],
-        "tonsil stones": [],
-        "healthy": []
+        # "tonsil stones": [],
+        # "healthy": []
     }
     
     # Open the CSV file for reading
@@ -125,7 +126,7 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
                     
-                if len(image_bytes) != 0:
+                if len(image_bytes) != 0 and disease in data.keys():
                     data[disease].append(image_bytes)
                     
     for key, value in data.items():
