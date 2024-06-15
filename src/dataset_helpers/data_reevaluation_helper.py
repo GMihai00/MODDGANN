@@ -120,6 +120,11 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
                     image_to_disease_data.append([file_path, option])
                 else:
                     image_to_disease_data.append([file_path, initial_disease])
+            else:
+                try:
+                    os.remove(file_path)
+                except OSError as e:
+                    print(f"Error deleting '{file_path}': {e}")
 
             root.destroy()  # Close the tkinter window when an option is selected
     

@@ -31,7 +31,7 @@ def define_model(model_name):
     model.compile(
         optimizer='adam',
         loss='binary_crossentropy',
-        metrics=['acc']
+        metrics=['acc', tf.keras.metrics.Precision()]
     )
     
     if os.path.isfile(WEIGHTS_BACKUP):
