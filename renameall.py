@@ -10,7 +10,7 @@ def rename_files(directory):
     # Loop through files and rename them
     for i, filename in enumerate(files):
         # Generate new file name
-        new_name = f"{i + 1}.jpg"  # Change the extension as needed
+        new_name = f"{100 + i}.jpg"  # Change the extension as needed
 
         # Full old and new file paths
         old_path = os.path.join(directory, filename)
@@ -18,10 +18,10 @@ def rename_files(directory):
 
         # Rename file
         os.rename(old_path, new_path)
-        print(f"{new_path},tonsillitis")
+        print(f"{new_path},healthy")
 
 # Set the directory path
-directory_path = "/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle"
+directory_path = "/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/healthy"
 
 # Call the function
 rename_files(directory_path)

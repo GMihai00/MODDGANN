@@ -8,9 +8,10 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 
 DISEASE_TO_CATEGORY = {
-    "pharyngitis": 0,
-    "tonsillitis": 1,
-    # "healthy" : 1
+    "healthy": 0,
+    "unhealthy": 1
+    # "pharyngitis": 0,
+    # "tonsillitis": 1,
     # "tonsil stones": 2,
     # "healthy" : 3
 }
@@ -106,8 +107,10 @@ def balanced_data_split(data, test_train_split, random_state=42):
 def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
     
     data = {
-        "pharyngitis": [],
-        "tonsillitis": [],
+        "healthy": [],
+        "unhealthy": []
+        # "pharyngitis": [],
+        # "tonsillitis": [],
         # "tonsil stones": [],
         # "healthy": []
     }
@@ -125,6 +128,9 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
             if len(row) == 2:  # Ensure there are two columns in the row
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
+                
+                if disease != 'healthy':
+                    disease = 'unhealthy'
                     
                 if len(image_bytes) != 0 and disease in data.keys():
                     data[disease].append(image_bytes)
