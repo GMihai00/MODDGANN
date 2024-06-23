@@ -171,3 +171,6 @@ saved_model
 
 src/model/logs/*
 *.weights.h5
+
+src/model/gann/sample
+src/model/gann/images

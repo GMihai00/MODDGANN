@@ -7,6 +7,11 @@ from PIL import Image
 
 from sklearn.model_selection import train_test_split
 
+EXPECTED_PHOTO_WIDTH = 160
+EXPECTED_PHOTO_HEIGHT = 160
+
+IS_RGB = True
+
 DISEASE_TO_CATEGORY = {
     "healthy": 0,
     "unhealthy": 1
