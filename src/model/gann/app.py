@@ -105,7 +105,7 @@ def main():
     
     # WORKAROUND FOR NOW
     try:
-        os.chdir("./src/model/gaan")
+        os.chdir("./src/model/gann")
     except:
         pass
     

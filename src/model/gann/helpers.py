@@ -44,6 +44,8 @@ def generate_and_save_images(model, epoch, test_input):
         else:
             plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
         plt.axis('off')
-
+    
+    
+    
     plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch + PREVIOUS_EPOCHS))
 #   plt.show()
