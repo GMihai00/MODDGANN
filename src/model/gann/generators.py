@@ -1,12 +1,12 @@
 import tensorflow as tf
 from tensorflow.keras import layers
-
+from helpers import noise_dim
 
 # should specify the input shape as well and try to see what layers need to be added
 def sample(output_shape):
 
     model = tf.keras.Sequential()
-    model.add(layers.Dense(10*10*256, use_bias=False, input_shape=(100,)))  # Adjusted to start with 10x10
+    model.add(layers.Dense(10*10*256, use_bias=False, input_shape=(noise_dim,)))  # Adjusted to start with 10x10
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
