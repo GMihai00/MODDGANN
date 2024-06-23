@@ -172,5 +172,5 @@ saved_model
 src/model/logs/*
 *.weights.h5
 
-src/model/gann/sample
+src/model/gann/training_checkpoints
 src/model/gann/images
