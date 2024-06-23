@@ -6,8 +6,6 @@ import math
 
 from data_processing_helpers import IS_RGB
 
-PREVIOUS_EPOCHS = 50
-
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
@@ -15,7 +13,7 @@ discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 noise_dim = 100
 # change this to 1 when you want to just generate images for your model
-num_examples_to_generate = 16
+num_examples_to_generate = 1
 
 # You will reuse this seed overtime (so it's easier)
 # to visualize progress in the animated GIF)
@@ -30,7 +28,7 @@ def discriminator_loss(real_output, fake_output):
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
     
-def generate_and_save_images(model, epoch, test_input):
+def generate_and_save_images(model, epoch, test_input, previous_epochs):
     # Notice `training` is set to False.
     # This is so all layers run in inference mode (batchnorm).
     predictions = model(test_input, training=False)
@@ -39,7 +37,7 @@ def generate_and_save_images(model, epoch, test_input):
     
     fig = plt.figure(figsize=(ratio, ratio))
     # enable when generating just the one photo
-    # plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     for i in range(predictions.shape[0]):
         plt.subplot(ratio, ratio, i+1)
         if IS_RGB:
@@ -52,5 +50,27 @@ def generate_and_save_images(model, epoch, test_input):
     
     
     
-    plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch + PREVIOUS_EPOCHS))
-#   plt.show()
+    plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch + previous_epochs))
+def write_number_to_file(filename, number):
+    try:
+        with open(filename, 'w') as file:
+            file.write(str(number))  # Write the number as a string
+        print(f"Number {number} has been written to {filename}")
+    except IOError as e:
+        print(f"Error writing to file {filename}: {e}")
+        
+def read_number_from_file(filename):
+    try:
+        with open(filename, 'r') as file:
+            content = file.read().strip()  # Read entire file content and strip any extra whitespace
+            number = int(content)  # Convert content to an integer
+        return number
+    except FileNotFoundError:
+        print(f"File {filename} does not exist. Returning 0.")
+        return 0
+    except IOError as e:
+        print(f"Error reading from file {filename}: {e}")
+        return None
+    except ValueError as e:
+        print(f"Error: File {filename} does not contain a valid number.")
+        return None

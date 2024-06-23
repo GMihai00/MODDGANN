@@ -1,6 +1,7 @@
 import argparse
 import time
 import os
+import helpers
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import PIL
@@ -12,6 +13,8 @@ import tensorflow as tf
 from IPython import display
 
 from helpers import *
+
+EPOCHS_FILE_NAME = "epochs.txt"
 
 from data_processing_helpers import EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB, read_data
 from helpers import generator_optimizer, discriminator_optimizer
@@ -55,7 +58,7 @@ def train_step(generator, discriminator, batch_size, images):
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
-def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_prefix):
+def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_prefix, previous_epochs):
     for epoch in range(epochs):
         start = time.time()
 
@@ -66,7 +69,8 @@ def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_pref
         display.clear_output(wait=True)
         generate_and_save_images(generator,
                                 epoch + 1,
-                                seed)
+                                seed,
+                                previous_epochs)
     
         # Save the model every 15 epochs
         if (epoch + 1) % 15 == 0:
@@ -78,7 +82,8 @@ def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_pref
         display.clear_output(wait=True)
         generate_and_save_images(generator,
                                 epochs,
-                                seed)
+                                seed,
+                                previous_epochs)
                                 
 def main(): 
     parser = argparse.ArgumentParser()
@@ -109,13 +114,16 @@ def main():
     except:
         pass
     
+    previous_epochs = read_number_from_file(EPOCHS_FILE_NAME)
+        
     train_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
     
     train_images = (train_images - 127.5) / 127.5  # Normalize the images to [-1, 1]
     
     train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(buffer_size).batch(batch_size)
     
-    train(generator, discriminator, train_dataset, train_epochs, checkpoint, checkpoint_prefix)
+    train(generator, discriminator, train_dataset, train_epochs, checkpoint, checkpoint_prefix, previous_epochs)
     
+    write_number_to_file(EPOCHS_FILE_NAME, previous_epochs + train_epochs)
 if __name__ == "__main__":
     main()
