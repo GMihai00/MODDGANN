@@ -4,8 +4,6 @@ import os
 import helpers
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-import PIL
-
 import discriminators
 import generators
 
@@ -28,14 +26,19 @@ def make_discriminator_model(model_name):
     return getattr(discriminators, model_name)(input_shape, )
 
 def get_checkpoint(generator, discriminator, model_name):
-    checkpoint_dir = './' + model_name + '/training_checkpoints'
+    checkpoint_dir = './training_checkpoints/' + model_name
     checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
     checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                     discriminator_optimizer=discriminator_optimizer,
                                     generator=generator,
                                     discriminator=discriminator)
                                 
-    checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+    latest_checkpoint = tf.train.latest_checkpoint(checkpoint_dir)
+    if latest_checkpoint:
+        checkpoint.restore(latest_checkpoint)
+        print(f"Latest checkpoint restored from {latest_checkpoint}")
+    else:
+        print("Checkpoint not found. Training from scratch.")
     
     return checkpoint, checkpoint_prefix
 
@@ -78,12 +81,12 @@ def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_pref
     
         print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
     
-        # Generate after the final epoch
-        display.clear_output(wait=True)
-        generate_and_save_images(generator,
-                                epochs,
-                                seed,
-                                previous_epochs)
+    # Generate after the final epoch
+    display.clear_output(wait=True)
+    generate_and_save_images(generator,
+                            epochs,
+                            seed,
+                            previous_epochs)
                                 
 def main(): 
     parser = argparse.ArgumentParser()
@@ -102,18 +105,16 @@ def main():
     model_name = args.model_name
     buffer_size = args.buffer_size
     
-    generator = make_generator_model(model_name)
-    discriminator = make_discriminator_model(model_name)
-    
-    checkpoint, checkpoint_prefix = get_checkpoint(generator, discriminator, model_name)
-    
-    
-    # WORKAROUND FOR NOW
     try:
         os.chdir("./src/model/gann")
     except:
         pass
+        
+    generator = make_generator_model(model_name)
+    discriminator = make_discriminator_model(model_name)
     
+    checkpoint, checkpoint_prefix = get_checkpoint(generator, discriminator, model_name)
+        
     previous_epochs = read_number_from_file(EPOCHS_FILE_NAME)
         
     train_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
