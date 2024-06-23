@@ -40,6 +40,10 @@ for start_epoch in range(0, total_iterations, batch_size):
     process = subprocess.Popen(command)
     
     # Wait for the subprocess to finish
-    process.wait()
+    exit_code = process.wait()
+    
+    if exit_code:
+        print("Failed to run all batches")
+        exit(exit_code)
 
 print("All batches completed.")

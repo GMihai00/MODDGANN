@@ -71,20 +71,29 @@ def train_step(generator, discriminator, batch_size, images):
 
         gen_loss = generator_loss(fake_output)
         disc_loss = discriminator_loss(real_output, fake_output)
-
+        
     gradients_of_generator = gen_tape.gradient(gen_loss, generator.trainable_variables)
     gradients_of_discriminator = disc_tape.gradient(disc_loss, discriminator.trainable_variables)
 
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
+    
+    return disc_loss, gen_loss
 
-def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_prefix):
+def train(generator, discriminator, dataset, epochs, batch_size, checkpoint, checkpoint_prefix):
     for epoch in range(epochs):
         start = time.time()
-
+        
+        d_loss = 0.0
+        g_loss = 0.0
         for image_batch in dataset:
-            train_step(generator, discriminator, epochs, image_batch)
-    
+            d_batch_loss, g_batch_loss = train_step(generator, discriminator, batch_size, image_batch)
+            d_loss += d_batch_loss
+            g_loss += g_batch_loss
+        
+        d_loss = d_loss/len(dataset)
+        g_loss = g_loss/len(dataset)
+
         # Produce images for the GIF as you go
         display.clear_output(wait=True)
         generate_and_save_images(generator,
@@ -95,8 +104,7 @@ def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_pref
         if (epoch + 1) % 15 == 0:
             checkpoint.save(file_prefix = checkpoint_prefix)
     
-        print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
-    
+        print(f"[{epoch+1:1.0f}/{epochs}] {(time.time()-start):1.4f}s - d_loss: {d_loss:1.4f} - g_loss: {g_loss:1.4f}")
     # Generate after the final epoch
     display.clear_output(wait=True)
     generate_and_save_images(generator,
@@ -140,7 +148,7 @@ def main():
     
     os.makedirs('./images', exist_ok=True)
     
-    train(generator, discriminator, train_dataset, train_epochs, checkpoint, checkpoint_prefix)
+    train(generator, discriminator, train_dataset, train_epochs, batch_size, checkpoint, checkpoint_prefix)
     
     write_number_to_file(EPOCHS_FILE_NAME, previous_epochs + train_epochs)
 
