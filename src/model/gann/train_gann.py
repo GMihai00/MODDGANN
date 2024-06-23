@@ -28,6 +28,7 @@ def make_discriminator_model(model_name):
 def cleanup_checkpoints(checkpoint_dir):
     
     original_dir =  os.getcwd()
+    os.makedirs(checkpoint_dir, exist_ok=True)
     os.chdir(checkpoint_dir)
     file_list = filter(os.path.isfile, os.listdir('.'))
 
@@ -108,7 +109,7 @@ def main():
     parser.add_argument("--input_data", type=str, help="CSV train input file")
     parser.add_argument("--model_name", type=str, help="Model name", default="sample")
     parser.add_argument("--epochs", type=int, help="Number of training epochs", default=50)
-    parser.add_argument("--batch_size", type=int, help="Batch size", default=256)
+    parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--buffer_size", type=int, help="Buffer size", default=6000)
     
     args = parser.parse_args()
@@ -136,6 +137,8 @@ def main():
     train_images = (train_images - 127.5) / 127.5  # Normalize the images to [-1, 1]
     
     train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(buffer_size).batch(batch_size)
+    
+    os.makedirs('./images', exist_ok=True)
     
     train(generator, discriminator, train_dataset, train_epochs, checkpoint, checkpoint_prefix)
     
