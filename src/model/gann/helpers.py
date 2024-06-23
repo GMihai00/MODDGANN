@@ -28,7 +28,7 @@ def discriminator_loss(real_output, fake_output):
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
     
-def generate_and_save_images(model, epoch, test_input, previous_epochs):
+def generate_and_save_images(model, epoch, test_input):
     # Notice `training` is set to False.
     # This is so all layers run in inference mode (batchnorm).
     predictions = model(test_input, training=False)
@@ -50,7 +50,7 @@ def generate_and_save_images(model, epoch, test_input, previous_epochs):
     
     
     
-    plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch + previous_epochs))
+    plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch))
 def write_number_to_file(filename, number):
     try:
         with open(filename, 'w') as file:

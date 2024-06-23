@@ -25,6 +25,20 @@ def make_discriminator_model(model_name):
     input_shape = [EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1]
     return getattr(discriminators, model_name)(input_shape, )
 
+def cleanup_checkpoints(checkpoint_dir):
+    
+    original_dir =  os.getcwd()
+    os.chdir(checkpoint_dir)
+    file_list = filter(os.path.isfile, os.listdir('.'))
+
+    # Sort the list of files based on their modification time.
+    sorted_files = sorted(file_list, key=os.path.getmtime, reverse=True)
+    
+    for file in sorted_files[5:]:
+        os.remove(file)
+        
+    os.chdir(original_dir)
+
 def get_checkpoint(generator, discriminator, model_name):
     checkpoint_dir = './training_checkpoints/' + model_name
     checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
@@ -39,6 +53,8 @@ def get_checkpoint(generator, discriminator, model_name):
         print(f"Latest checkpoint restored from {latest_checkpoint}")
     else:
         print("Checkpoint not found. Training from scratch.")
+    
+    cleanup_checkpoints(checkpoint_dir)
     
     return checkpoint, checkpoint_prefix
 
@@ -61,7 +77,7 @@ def train_step(generator, discriminator, batch_size, images):
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
-def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_prefix, previous_epochs):
+def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_prefix):
     for epoch in range(epochs):
         start = time.time()
 
@@ -72,8 +88,7 @@ def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_pref
         display.clear_output(wait=True)
         generate_and_save_images(generator,
                                 epoch + 1,
-                                seed,
-                                previous_epochs)
+                                seed)
     
         # Save the model every 15 epochs
         if (epoch + 1) % 15 == 0:
@@ -85,8 +100,7 @@ def train(generator, discriminator, dataset, epochs, checkpoint, checkpoint_pref
     display.clear_output(wait=True)
     generate_and_save_images(generator,
                             epochs,
-                            seed,
-                            previous_epochs)
+                            seed)
                                 
 def main(): 
     parser = argparse.ArgumentParser()
@@ -123,8 +137,9 @@ def main():
     
     train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(buffer_size).batch(batch_size)
     
-    train(generator, discriminator, train_dataset, train_epochs, checkpoint, checkpoint_prefix, previous_epochs)
+    train(generator, discriminator, train_dataset, train_epochs, checkpoint, checkpoint_prefix)
     
     write_number_to_file(EPOCHS_FILE_NAME, previous_epochs + train_epochs)
+
 if __name__ == "__main__":
     main()
