@@ -13,7 +13,7 @@ generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 noise_dim = 100
-num_examples_to_generate = 16
+num_examples_to_generate = 1
 
 # You will reuse this seed overtime (so it's easier)
 # to visualize progress in the animated GIF)
@@ -33,16 +33,16 @@ def generate_and_save_images(model, epoch, test_input):
     # This is so all layers run in inference mode (batchnorm).
     predictions = model(test_input, training=False)
 
-    fig = plt.figure(figsize=(4, 4))
-
+    fig = plt.figure(figsize=(1, 1))
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     for i in range(predictions.shape[0]):
-        plt.subplot(4, 4, i+1)
+        plt.subplot(1, 1, i+1)
         if IS_RGB:
             img_rgb = tf.clip_by_value(predictions[i] * 127.5 + 127.5, 0, 255)
             img_rgb = tf.cast(img_rgb, tf.uint8)
-            plt.imshow(img_rgb)
+            plt.imshow(img_rgb, aspect='auto')
         else:
-            plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
+            plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray', aspect='auto')
         plt.axis('off')
     
     
