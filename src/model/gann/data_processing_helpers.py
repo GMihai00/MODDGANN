@@ -59,7 +59,7 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
                     
-                if len(image_bytes) != 0:
+                if len(image_bytes) != 0 and disease == 'healthy':
                     data.append(image_bytes)
                     
     return np.array(data)
