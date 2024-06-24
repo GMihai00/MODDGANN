@@ -1,7 +1,6 @@
 import argparse
 import time
 import os
-import helpers
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import discriminators
@@ -15,7 +14,6 @@ from helpers import *
 EPOCHS_FILE_NAME = "epochs.txt"
 
 from data_processing_helpers import EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB, read_data
-from helpers import generator_optimizer, discriminator_optimizer
 
 def make_generator_model(model_name):
     output_shape=(None, EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
@@ -65,10 +63,10 @@ def train_step(generator, discriminator, batch_size, images):
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
         generated_images = generator(noise, training=True)
-
+        
         real_output = discriminator(images, training=True)
         fake_output = discriminator(generated_images, training=True)
-
+        
         gen_loss = generator_loss(fake_output)
         disc_loss = discriminator_loss(real_output, fake_output)
         
@@ -100,8 +98,8 @@ def train(generator, discriminator, dataset, epochs, batch_size, checkpoint, che
                                 epoch + 1,
                                 seed)
     
-        # Save the model every 15 epochs
-        if (epoch + 1) % 15 == 0:
+        # Save the model every 50 epochs
+        if (epoch + 1) % 50 == 0:
             checkpoint.save(file_prefix = checkpoint_prefix)
     
         print(f"[{epoch+1:1.0f}/{epochs}] {(time.time()-start):1.4f}s - d_loss: {d_loss:1.4f} - g_loss: {g_loss:1.4f}")

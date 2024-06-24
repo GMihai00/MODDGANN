@@ -11,7 +11,7 @@ cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-noise_dim = 100
+noise_dim = 400
 # change this to 1 when you want to just generate images for your model
 num_examples_to_generate = 1
 
@@ -28,7 +28,7 @@ def discriminator_loss(real_output, fake_output):
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
     
-def generate_and_save_images(model, epoch, test_input):
+def generate_and_save_images(model, epoch, test_input, dir='./images'):
     # Notice `training` is set to False.
     # This is so all layers run in inference mode (batchnorm).
     predictions = model(test_input, training=False)
@@ -49,8 +49,7 @@ def generate_and_save_images(model, epoch, test_input):
         plt.axis('off')
     
     
-    
-    plt.savefig('./images/image_at_epoch_{:04d}.png'.format(epoch))
+    plt.savefig(dir + '/image_at_epoch_{:04d}.png'.format(epoch))
 def write_number_to_file(filename, number):
     try:
         with open(filename, 'w') as file:
@@ -73,4 +72,18 @@ def read_number_from_file(filename):
         return None
     except ValueError as e:
         print(f"Error: File {filename} does not contain a valid number.")
-        return None
+        return 
+
+stddev=0.0002
+
+gaussian_noise_layer = tf.keras.layers.GaussianNoise(stddev=stddev)
+    
+def add_gaussian_noise(images):
+    rez = []
+    for i in range (0, images.shape[0]):
+        noisy_image_tensor = gaussian_noise_layer(images[i], training=True)
+        noisy_image_tensor = tf.cast((noisy_image_tensor * 255.0 - 127.5) / 127.5, tf.float32)
+        rez.append(noisy_image_tensor)
+        
+    return tf.convert_to_tensor(rez, dtype=tf.float32)
+
