@@ -119,7 +119,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-215-_jpg.rf.1ba7fcd93b7cbeff18700a0ba49b69ad.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-200-_JPG_jpg.rf.7033690c6406620d37ee4c8b87138879.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/12.jpg,tonsil stones
-
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-151-_JPG_jpg.rf.e8e0e42277f1b5cf9b59e3c2fe8292a7.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-207-_jpg.rf.4617ae1dceaac959fadb6964063a79c9.jpg,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-158-_JPG_jpg.rf.77b5876da6ca0c3c9ae0b8e711200029.jpg,pharyngitis
@@ -157,7 +156,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/valid/1/10c1eacd-cbac-4b07-ae72-08aecf4ee996_jpg.rf.1d2a7483f0ad4bb344a792452aa83b40.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/2/1efd38d4-c0c6-48e3-bffd-eb4637f76ced_jpg.rf.85b3299a0214e1f7f8123b37ba3e6553.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/38.jpg,tonsillitis
-
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-145-_JPG_jpg.rf.42fedb3d84100706e0fb7e2e518051c2.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/35.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-191-_JPG_jpg.rf.96729ed78fab49f37ea15fb0321efee9.jpg,tonsillitis
@@ -347,7 +345,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-201-_JPG_jpg.rf.2955953ec3a9fd01a1a79eb99e500b82.jpg,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/27.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-212-_jpg.rf.f6e358da481705951779261e8c2d34b4.jpg,pharyngitis
-
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-140-_JPG_jpg.rf.936ff890a24137db1905120535ebb86c.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-115-_JPG_jpg.rf.1be28e4ed5c80a67427b69ef068264c4.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-167-_JPG_jpg.rf.45d6ba5bd76f2abdb88ca5b0100ea893.jpg,pharyngitis
@@ -356,8 +353,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/valid/1/3a36f4f2-5f37-4572-8439-04903542f023_jpg.rf.4167e5bb116af870f793b55e4d9b6225.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/1/2e59c234-bc40-448f-9467-2e4abceebf5a_jpg.rf.6a66461ee952c6bc133dff773e362063.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/valid/3/nopharyngitis-130-_JPG_jpg.rf.2336e33158abcc92d82c304e4c33efde.jpg,pharyngitis
-
-
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-168-_JPG_jpg.rf.2fbd0336aad8038de2aeee3162b8042e.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-30-_JPG_jpg.rf.aa5913f00c9255df2116123cb215657b.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/personal_photos/14.jpg,tonsillitis
@@ -365,7 +360,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/26.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/2/5d7bf45c-12cb-4eff-a38c-c6dd706d7a84_jpg.rf.d96f18ea508281089f124569ec5c095e.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/2/21190f7c-570e-45ef-bf93-d09e43cf712b_jpg.rf.adf568e64ccd78a7c90a492b4781e721.jpg,healthy
-
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/tonsil_stones/18.png,tonsil stones
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-188-_JPG_jpg.rf.e29d488ce9f32483256c0f39b70a44a4.jpg,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/valid/2/0857139f-3ec5-40fa-a735-e248ce6e3bf7_jpg.rf.14cf889f142d329a8d47e1e2b76c2756.jpg,pharyngitis
@@ -381,7 +375,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-88-_JPG_jpg.rf.a58f9c927c80881a0782a9c4f41bacd1.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-66-_JPG_jpg.rf.18bcff911766300e9298efeced0b1214.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-158-_JPG_jpg.rf.9c55c61d1dff4ef986c61fc312901525.jpg,pharyngitis
-
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-92-_JPG_jpg.rf.17d7ab9ebf1a8f9b2facf4fade74c21b.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-15-_JPG_jpg.rf.02e29bda466ab3500138e535288a5070.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/healthy/1.jpg,healthy
