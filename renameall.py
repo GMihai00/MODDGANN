@@ -21,7 +21,7 @@ def rename_files(directory):
         print(f"{new_path},healthy")
 
 # Set the directory path
-directory_path = "/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/healthy"
+directory_path = "/home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images"
 
 # Call the function
 rename_files(directory_path)
