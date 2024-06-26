@@ -33,9 +33,12 @@ def generate_and_save_images(model, epoch, test_input, dir='./images'):
     # This is so all layers run in inference mode (batchnorm).
     predictions = model(test_input, training=False)
     
-    ratio = int(math.sqrt(num_examples_to_generate))
+    # ratio = int(math.sqrt(num_examples_to_generate))
     
-    fig = plt.figure(figsize=(ratio, ratio))
+    ratio = int(predictions.shape[0]**0.5)
+    
+    fig = plt.figure(figsize=(ratio * 2, ratio * 2))
+
     # enable when generating just the one photo
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     for i in range(predictions.shape[0]):
@@ -43,6 +46,9 @@ def generate_and_save_images(model, epoch, test_input, dir='./images'):
         if IS_RGB:
             img_rgb = tf.clip_by_value(predictions[i] * 127.5 + 127.5, 0, 255)
             img_rgb = tf.cast(img_rgb, tf.uint8)
+            img_rgb = img_rgb.numpy()
+            if img_rgb.shape[-1] == 4:
+                img_rgb = img_rgb[:, :, :3]
             plt.imshow(img_rgb, aspect='auto')
         else:
             plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray', aspect='auto')

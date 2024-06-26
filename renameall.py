@@ -10,7 +10,7 @@ def rename_files(directory):
     # Loop through files and rename them
     for i, filename in enumerate(files):
         # Generate new file name
-        new_name = f"{1 + i}.jpg"  # Change the extension as needed
+        new_name = f"{1 + i}.png"  # Change the extension as needed
 
         # Full old and new file paths
         old_path = os.path.join(directory, filename)

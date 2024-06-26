@@ -54,10 +54,12 @@ def convert_image_to_bytes(image_path, expected_photo_height, expected_photo_wid
         
         image.close()
         
+        print(f"Image array shape before reshape: {image_array.shape}")
+
         return image_array.reshape(expected_photo_width, expected_photo_height, 3 if rgb else 1)
         
     except Exception as e:
-        print(f"Image {image_path} not found")
+        print(f"Image {image_path} not found, {repr(e)}")
         return []
         
 def disease_classification_distribution(disease_type):
