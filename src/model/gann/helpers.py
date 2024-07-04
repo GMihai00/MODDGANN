@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import tensorflow as tf
 import math
+from PIL import Image
 
 from data_processing_helpers import IS_RGB
 
@@ -35,27 +36,19 @@ def generate_and_save_images(model, epoch, test_input, dir='./images'):
     
     # ratio = int(math.sqrt(num_examples_to_generate))
     
-    ratio = int(predictions.shape[0]**0.5)
-    
-    fig = plt.figure(figsize=(ratio * 2, ratio * 2))
-
-    # enable when generating just the one photo
-    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     for i in range(predictions.shape[0]):
-        plt.subplot(ratio, ratio, i+1)
+        image_data = predictions[i].numpy() * 127.5 + 127.5
+        image_data = image_data.astype(np.uint8)
         if IS_RGB:
-            img_rgb = tf.clip_by_value(predictions[i] * 127.5 + 127.5, 0, 255)
-            img_rgb = tf.cast(img_rgb, tf.uint8)
-            img_rgb = img_rgb.numpy()
-            if img_rgb.shape[-1] == 4:
-                img_rgb = img_rgb[:, :, :3]
-            plt.imshow(img_rgb, aspect='auto')
+            
+            image = Image.fromarray(image_data, 'RGB')
+            
+            image.save(dir + '/image{:04d}_at_epoch_{:04d}.png'.format(i, epoch))
         else:
-            plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray', aspect='auto')
-        plt.axis('off')
-    
-    
-    plt.savefig(dir + '/image_at_epoch_{:04d}.png'.format(epoch))
+            image = Image.fromarray(image_data, 'L')
+            
+            image.save(dir + '/image{:04d}_at_epoch_{:04d}.png'.format(i, epoch))
+            
 def write_number_to_file(filename, number):
     try:
         with open(filename, 'w') as file:
