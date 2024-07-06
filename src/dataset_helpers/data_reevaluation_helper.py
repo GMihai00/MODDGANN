@@ -202,7 +202,6 @@ def main():
     parser.add_argument("--input", type=str, help="Csv with validated data")
     parser.add_argument("--output", type=str, help="Csv output file path", default="data_reevaluated.csv")
     parser.add_argument("--skip_reevaluation", type=bool, help="If nothing apart from dataset details should be done", default=False)
-    
     args = parser.parse_args()
     
     input_file = args.input
