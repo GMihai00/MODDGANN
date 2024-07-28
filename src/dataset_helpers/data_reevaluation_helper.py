@@ -83,6 +83,10 @@ def center_window(root, photo_height, photo_width):
     
 def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
     # Check if the image file exists
+    
+    if initial_disease != 'tonsil stones':
+        return
+
     if os.path.exists(file_path):
 
         file_path = os.path.abspath(file_path)
