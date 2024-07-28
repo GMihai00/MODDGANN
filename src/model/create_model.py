@@ -26,6 +26,8 @@ def define_model(model_name):
     
     model.compile(
         optimizer='adam',
+        # # for bigger jumps, in case of stuck in plato zone for to long, applied to last model
+        # optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
         loss='categorical_crossentropy',
         metrics=[
             'accuracy',
