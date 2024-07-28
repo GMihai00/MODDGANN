@@ -12,13 +12,19 @@ EXPECTED_PHOTO_HEIGHT = 160
 
 IS_RGB = True
 
+# change this one only to modify number of classes, TO DO: pass as argument instead ";" spaced
 DISEASE_TO_CATEGORY = {
-    "healthy": 0,
-    "unhealthy": 1
+    # # FIRST MODEL
+    # "healthy": 0,
+    # "unhealthy": 1
+    
+    # # SECOND MODEL
     # "pharyngitis": 0,
-    # "tonsillitis": 1,
-    # "tonsil stones": 2,
-    # "healthy" : 3
+    # "tonsil_disease": 1
+    
+    # LAST MODEL
+    "tonsillitis": 0,
+    "mononucleosis": 1
 }
 
 DISEASES = list(DISEASE_TO_CATEGORY.keys())
@@ -114,13 +120,10 @@ def balanced_data_split(data, test_train_split, random_state=42):
 def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
     
     data = {
-        "healthy": [],
-        "unhealthy": []
-        # "pharyngitis": [],
-        # "tonsillitis": [],
-        # "tonsil stones": [],
-        # "healthy": []
     }
+    
+    for disease in DISEASE_TO_CATEGORY.keys():
+        data[disease] = []
     
     # Open the CSV file for reading
     with open(file_path, mode='r') as file:
@@ -136,8 +139,13 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
                 
-                if disease != 'healthy':
-                    disease = 'unhealthy'
+                # healthy unhealthy classification only, TO DO: add as flag 
+                # if disease != 'healthy':
+                #     disease = 'unhealthy'
+                
+                # pharyngitis tonsil_disease classification only, TO DO add as flag
+                # if disease != "pharyngitis" and disease != "healthy":
+                #     disease = "tonsil_disease"
                     
                 if len(image_bytes) != 0 and disease in data.keys():
                     data[disease].append(image_bytes)

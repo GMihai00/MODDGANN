@@ -6,7 +6,7 @@ import csv
 import argparse
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
-DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "tonsil stones", "healthy", "quit", "remove"]
+DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "mononucleosis", "healthy", "quit", "remove"]
 
 old_image_to_disease_data = [
 
@@ -46,7 +46,7 @@ def load_already_validated_images(csv_file_path):
 image_per_disease = {
     "pharyngitis" : 0,
     "tonsillitis": 0,
-    "tonsil stones": 0,
+    "mononucleosis": 0,
     "healthy" : 0
 }
 
@@ -59,8 +59,9 @@ def load_classified_images(csv_file_path):
             for row in csv_reader:
                 # Assuming the first column contains the values you want to insert into the set
                 
-                old_image_to_disease_data.append([convert_path(row[0]), row[1]])
-                image_per_disease[row[1]]+=1
+                if row[1] in image_per_disease.keys():
+                    old_image_to_disease_data.append([convert_path(row[0]), row[1]])
+                    image_per_disease[row[1]]+=1
 
     except Exception as err:
         print(err)
@@ -83,9 +84,6 @@ def center_window(root, photo_height, photo_width):
     
 def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
     # Check if the image file exists
-    
-    if initial_disease != 'tonsil stones':
-        return
 
     if os.path.exists(file_path):
 
@@ -150,9 +148,12 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
 
 
 def summarize_dataset():
+    total = 0
     for key, value in image_per_disease.items():
         print(f"Samples {key}: {value} images")
-
+        total += value
+        
+    print(f"Total: {total} images")
 
 def display_validated_data(output_file):
     for key, value in old_image_to_disease_data:
