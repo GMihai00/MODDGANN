@@ -18,10 +18,10 @@ def rename_files(directory):
 
         # Rename file
         os.rename(old_path, new_path)
-        print(f"{new_path},mononucleosis")
+        print(f"{new_path},pharyngitis")
 
 # Set the directory path
-directory_path = "/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis"
+directory_path = "/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/pharyngitis"
 
 # Call the function
 rename_files(directory_path)
