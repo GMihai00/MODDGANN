@@ -4,6 +4,7 @@ import os
 import tkinter as tk
 import csv
 import argparse
+import numpy as np
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
 DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "mononucleosis", "healthy", "quit", "remove"]
@@ -50,6 +51,35 @@ image_per_disease = {
     "healthy" : 0
 }
 
+def convert_image_to_bytes(image_path, expected_photo_height = 160, expected_photo_width = 160, rgb = True):
+    try:
+    
+        image = Image.open(image_path)
+        
+        if not rgb:
+            image = image.convert("L")
+        
+        width, height = image.size
+        
+        if height != expected_photo_height or width != expected_photo_width:
+            #resize to fit the model size
+            print(f"Warning resizing image {image_path} to fit the model requirements")
+            print(f"Initial size: {width}:{height}, target size: {expected_photo_width}:{expected_photo_height}")
+            image = image.resize((expected_photo_width, expected_photo_height), Image.Resampling.LANCZOS)
+        
+        # normalize data
+        image_array = np.array(image)
+        
+        image.close()
+        
+        print(f"Image array shape before reshape: {image_array.shape}")
+
+        return image_array.reshape(expected_photo_width, expected_photo_height, 3 if rgb else 1)
+        
+    except Exception as e:
+        print(f"Image {image_path} not found, {repr(e)}")
+        return []
+        
 def load_classified_images(csv_file_path):
     try:
         with open(csv_file_path, 'r') as file:
@@ -57,11 +87,15 @@ def load_classified_images(csv_file_path):
             # skip column definition row
             next(csv_reader) 
             for row in csv_reader:
+                if len(row) == 2:
                 # Assuming the first column contains the values you want to insert into the set
-                
-                if row[1] in image_per_disease.keys():
-                    old_image_to_disease_data.append([convert_path(row[0]), row[1]])
-                    image_per_disease[row[1]]+=1
+                    image_path, disease = row
+                    image_bytes = convert_image_to_bytes(convert_path(image_path))
+                        
+                    if len(image_bytes) != 0 and (disease in image_per_disease.keys()):
+                        
+                        old_image_to_disease_data.append([convert_path(image_path), disease])
+                        image_per_disease[disease]+=1
 
     except Exception as err:
         print(err)
@@ -201,6 +235,9 @@ def save_data_to_csv(csv_file_path):
     except Exception as e:
         print(f"Failed to save data to file {csv_file_path}, err: {e}")
 
+def remove_invalid_entries(output_file):
+    pass
+
 def main():
     parser = argparse.ArgumentParser()
     
@@ -245,6 +282,6 @@ def main():
         display_validated_data(output_file)
         
         save_data_to_csv(output_file)
-
+    
 if __name__ == "__main__":
     main()

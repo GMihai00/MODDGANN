@@ -146,7 +146,15 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
                 # pharyngitis tonsil_disease classification only, TO DO add as flag
                 # if disease != "pharyngitis" and disease != "healthy":
                 #     disease = "tonsil_disease"
-                    
+                
+                if len(image_bytes) == 0:
+                    if not os.path.exists(f'errs.txt'):
+                        with open(f'errs.txt', 'w') as file:
+                            file.write(f"{image_path}\n")
+                    else:
+                        with open('errs.txt', 'a') as file:
+                            file.write(f"{image_path}\n")
+                
                 if len(image_bytes) != 0 and disease in data.keys():
                     data[disease].append(image_bytes)
                     
