@@ -63,8 +63,7 @@ def convert_image_to_bytes(image_path, expected_photo_height = 160, expected_pho
         
         if height != expected_photo_height or width != expected_photo_width:
             #resize to fit the model size
-            print(f"Warning resizing image {image_path} to fit the model requirements")
-            print(f"Initial size: {width}:{height}, target size: {expected_photo_width}:{expected_photo_height}")
+
             image = image.resize((expected_photo_width, expected_photo_height), Image.Resampling.LANCZOS)
         
         # normalize data
@@ -72,7 +71,6 @@ def convert_image_to_bytes(image_path, expected_photo_height = 160, expected_pho
         
         image.close()
         
-        print(f"Image array shape before reshape: {image_array.shape}")
 
         return image_array.reshape(expected_photo_width, expected_photo_height, 3 if rgb else 1)
         
@@ -191,6 +189,7 @@ def summarize_dataset():
 
 def display_validated_data(output_file):
     for key, value in old_image_to_disease_data:
+        # image_to_disease_data.append([key, value]) to just remove missing files 
         display_image_and_wait_for_choice(key, value, output_file);
 
 
