@@ -23,8 +23,15 @@ DISEASE_TO_CATEGORY = {
     # "tonsil_disease": 1
     
     # LAST MODEL
-    "tonsillitis": 0,
-    "mononucleosis": 1
+    # "tonsillitis": 0,
+    # "mononucleosis": 1
+    
+    # FOR ENSEMBLE
+    "healthy": 0,
+    "pharyngitis": 1,
+    "tonsillitis": 2,
+    "mononucleosis": 3
+    
 }
 
 DISEASES = list(DISEASE_TO_CATEGORY.keys())

@@ -108,7 +108,6 @@ def main():
     
     save_model_weights(model, model_name)
     
-
     model.evaluate(x_test,  y_test, verbose=2)
 
 
