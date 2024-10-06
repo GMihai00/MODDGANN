@@ -10,11 +10,13 @@
                 "--input_data",
                 "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv",
                 "--model_name",
-                "EfficientNetV2M",
+                "InceptionV3",
                 "--epochs",
                 "50",
                 "--model_type",
-                "healthy-unhealthy"
+                "healthy-unhealthy",
+                "--training_sample",
+                "10"
             ],
             "console": "integratedTerminal"
         }
