@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Python Script with Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/gann/app.py",
+            "args": [
+                "--input_data",
+                "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv",
+                "--model_name",
+                "sample",
+                "--epochs",
+                "10000",
+                "--batch_size",
+                "400"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

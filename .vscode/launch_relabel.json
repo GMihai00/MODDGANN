@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Python Script with Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dataset_helpers/data_reevaluation_helper.py",
+            "args": [
+                "--input",
+                "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Python Script with Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/gann/generate_images.py",
+            "args": [
+                "--model_name",
+                "sample"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
