@@ -5,10 +5,16 @@
             "name": "Run Python Script with Args",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/model/ensemble_models.py",
+            "program": "${workspaceFolder}/src/model/main.py",
             "args": [
                 "--input_data",
-                "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv"
+                "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv",
+                "--model_name",
+                "EfficientNetV2M",
+                "--epochs",
+                "50",
+                "--model_type",
+                "healthy-unhealthy"
             ],
             "console": "integratedTerminal"
         }

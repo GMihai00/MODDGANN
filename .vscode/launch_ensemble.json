@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Python Script with Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/ensemble_models.py",
+            "args": [
+                "--input_data",
+                "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

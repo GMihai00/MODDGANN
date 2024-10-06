@@ -1,3 +1,10 @@
+import logging
+
+# Configure the logger
+logging.basicConfig(
+    level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Format of the log messages
+)
 
 import argparse
 import os
@@ -15,12 +22,14 @@ from training_callbacks import ImagePredictionLogger
 from data_processing_helpers import *
 import models
 
+def get_log_dir(model_name):
+    return "logs/" + model_name + datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
 
-def define_model(model_name):
+def define_model(model_type, model_name):
 
     input_shape = (EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
     
-    model = getattr(models, model_name)(input_shape, NR_DISEASES)
+    model = getattr(models, model_name)(input_shape, get_nr_diseases(model_type))
         
     WEIGHTS_BACKUP  = model_name + ".weights.h5"
     
@@ -52,7 +61,7 @@ def save_model(model, model_name):
     model.save("saved_model/" + model_name)
 
 def main():
-    print(tf.config.list_physical_devices('GPU'))
+    logging.debug(tf.config.list_physical_devices('GPU'))
     
     parser = argparse.ArgumentParser()
     
@@ -60,18 +69,20 @@ def main():
     parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
     parser.add_argument("--epochs", type=int, help="Number of training epochs", default=100)
     parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
-    parser.add_argument("--test_train_split", type=int, help="Data Split", default=0.2)
-
+    parser.add_argument("--train_rest_split", type=int, help="Data Split", default=0.2)
+    parser.add_argument("--model_type", type=str, help="Type of model to use. Options: \"healthy-unhealthy\"; \"pharyngitis-tonsil_disease\"; \"tonsillitis-mononucleosis\"; \"ensemble\"")
+    
     args = parser.parse_args()
     
     input_data = args.input_data
     train_epochs = args.epochs
     batch_size = args.batch_size
     model_name = args.model_name
-    test_train_split = args.test_train_split
+    train_rest_split = args.train_rest_split
+    model_type = args.model_type
     
     if input_data == None:
-        print("Missing train and test input, quitting")
+        logging.error("Missing train and test input, quitting")
         exit(5)
     
     # WORKAROUND FOR NOW
@@ -80,29 +91,23 @@ def main():
     except:
         pass
     
-    data = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
+    data = read_data(model_type, input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
     
-    x_train, y_train, x_split, y_split = balanced_data_split(data, test_train_split)
+    normalize_data(data)
     
-    x_valid, x_test, y_valid, y_test = train_test_split(x_split, y_split, test_size=0.5, random_state=42)
+    x_train, y_train, x_valid, y_valid, x_test, y_test = stratified_data_split(model_type, data, train_rest_split)
     
-    print(f"Data size:{len(x_train) + len(x_test) + len(x_valid)}")
+    logging.info(f"Train: {len(x_train)} Test: {len(x_test)} Validate: {len(x_valid)}")
 
-    log_dir = "logs/" + model_name + datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
-    
-    # create callbacks with unprocessed images
-        
-    x_train = x_train / 255
-    x_test = x_test / 255
-    x_valid = x_valid / 255
+    log_dir = get_log_dir(model_name)
     
     train_callbacks = []
     train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
-    train_callbacks.append(ImagePredictionLogger((x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
+    train_callbacks.append(ImagePredictionLogger(model_type, (x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
 
-    model = define_model(model_name)
+    model = define_model(model_type, model_name)
     
-    model.summary()
+    # model.summary()
     
     model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_valid,  y_valid), callbacks=train_callbacks)
     

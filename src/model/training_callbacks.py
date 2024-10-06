@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
 
-from data_processing_helpers import distribution_to_label, CLASS_NAMES
+from data_processing_helpers import distribution_to_label, get_diseases
 
 def plot_to_image(figure):
     """Converts the matplotlib plot specified by 'figure' to a PNG image and
@@ -56,8 +56,9 @@ def plot_confusion_matrix(cm, class_names):
     return figure
 
 class ConfusionMatrixLogger(Callback):
-    def __init__(self, validation_data, log_dir, nr_epochs):
+    def __init__(self, model_type, validation_data, log_dir, nr_epochs):
         super(ConfusionMatrixLogger, self).__init__()
+        self.model_type = model_type
         self.validation_data = validation_data
         self.log_dir = log_dir
         self.nr_epochs = nr_epochs
@@ -73,7 +74,7 @@ class ConfusionMatrixLogger(Callback):
             # Calculate the confusion matrix.
             cm = confusion_matrix(np.argmax(y_test, axis=1), test_pred)
             # Log the confusion matrix as an image summary.
-            figure = plot_confusion_matrix(cm, class_names=CLASS_NAMES)
+            figure = plot_confusion_matrix(cm, class_names=get_diseases(self.model_type))
             cm_image = plot_to_image(figure)
         
             # Log the confusion matrix as an image summary.
@@ -81,8 +82,9 @@ class ConfusionMatrixLogger(Callback):
                 tf.summary.image("epoch_confusion_matrix", cm_image, step=epoch)
                     
 class ImagePredictionLogger(Callback):
-    def __init__(self, validation_data, log_dir, nr_epochs, expected_photo_height, expected_photo_width, rgb):
+    def __init__(self, model_type, validation_data, log_dir, nr_epochs, expected_photo_height, expected_photo_width, rgb):
         super(ImagePredictionLogger, self).__init__()
+        self.model_type = model_type
         self.validation_data = validation_data
         self.log_dir = log_dir
         self.nr_epochs = nr_epochs
@@ -103,4 +105,4 @@ class ImagePredictionLogger(Callback):
                     
                     display_image = np.reshape(images[i], (-1, self.expected_photo_width , self.expected_photo_height, 3 if self.rgb else 1))
                     
-                    tf.summary.image(f"v:{distribution_to_label(labels[i])}_p:{distribution_to_label(predictions[i])}_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(labels[i])}\n prediction: {distribution_to_label(predictions[i])}")
+                    tf.summary.image(f"v:{distribution_to_label(self.model_type, labels[i])}_p:{distribution_to_label(self.model_type, predictions[i])}_{i}", display_image, step=epoch, description=f"label: {distribution_to_label(self.model_type, labels[i])}\n prediction: {distribution_to_label(self.model_type, predictions[i])}")

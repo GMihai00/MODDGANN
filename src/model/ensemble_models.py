@@ -151,7 +151,7 @@ def main():
         # y_pred_distribution.append(extended_prediction)
         y_pred_labels.append(prediction)
 
-        # print(f"value: {distribution_to_label(output)} prediction: {DISEASES[prediction]}")
+        # print(f"value: {distribution_to_label("ensemble", output)} prediction: {get_diseases("ensemble")[prediction]}")
     
     # y_pred = np.array(y_pred_distribution)     
     
