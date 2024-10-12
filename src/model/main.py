@@ -176,7 +176,7 @@ def match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y
             y_test_specific.append(new_y)
             x_test_specific.append(x)
     
-    return x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific
+    return np.array(x_train_specific), np.array(y_train_specific), np.array(x_valid_specific), np.array(y_valid_specific), np.array(x_test_specific), np.array(y_test_specific)
 
 def get_data_diseases(model_type, y_train, y_valid, y_test):
 
