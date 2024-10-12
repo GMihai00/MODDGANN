@@ -10,6 +10,7 @@ import argparse
 import os
 import subprocess
 import datetime
+import time
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # to disable cuda
@@ -312,6 +313,7 @@ def display_training_results(training_results):
         logging.info(f"Mean Loss: {mean_metrics[0]:.4f} Mean Accuracy: {mean_metrics[1]:.4f} Mean Precision: {mean_metrics[2]:.4f} Mean Recall: {mean_metrics[3]:.4f}")
 
 def main():
+    start_time = time.time()
     logging.debug(tf.config.list_physical_devices('GPU'))
     
     parser = argparse.ArgumentParser()
@@ -367,6 +369,14 @@ def main():
             train_model(model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
         
     display_training_results(TRAINING_RESULTS)
+    
+    # Stop timer
+    end_time = time.time()
+    elapsed_time = end_time - start_time  # Time in seconds
+
+    # Convert seconds to minutes
+    elapsed_minutes = elapsed_time / 60
+    print(f"Elapsed time: {elapsed_minutes:.2f} minutes")
     
 if __name__ == "__main__":
     main()
