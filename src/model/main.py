@@ -180,7 +180,7 @@ def match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y
 
 def get_data_diseases(model_type, y_train, y_valid, y_test):
 
-    entries = y_train + y_valid + y_test
+    entries = np.concatenate((y_train, y_valid, y_test), axis=0)
     
     data = {
     }
