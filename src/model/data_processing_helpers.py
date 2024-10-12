@@ -97,6 +97,33 @@ def distribution_to_label(model_type, distribution):
     
     return get_diseases(model_type)[disease_index]
     
+    
+def convert_model_distribution(old_model_type, new_model_type, distribution):
+    old_label = distribution_to_label(old_model_type, distribution)
+    
+    new_label = convert_disease_label(new_model_type, old_label)
+    
+    if new_label == None:
+        return None
+    
+    disease_to_category = get_disease_to_category(new_model_type)
+        
+    return disease_classification_distribution(new_model_type, disease_to_category[new_label])
+    
+def convert_disease_label(model_type, disease):
+
+    if model_type == 'healthy-unhealthy':
+        if disease != 'healthy':
+            return 'unhealthy'
+    elif model_type == 'pharyngitis-tonsil_disease':
+        if disease != "pharyngitis" and disease != "healthy":
+            return "tonsil_disease"
+            
+    if disease in get_disease_to_category(model_type).keys():
+        return disease
+    else:
+        return None
+    
 def read_data(model_type, file_path, expected_photo_height, expected_photo_width, rgb):
     
     data = {
@@ -115,12 +142,7 @@ def read_data(model_type, file_path, expected_photo_height, expected_photo_width
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
                 
-                if model_type == 'healthy-unhealthy':
-                    if disease != 'healthy':
-                        disease = 'unhealthy'
-                elif model_type == 'pharyngitis-tonsil_disease':
-                    if disease != "pharyngitis" and disease != "healthy":
-                        disease = "tonsil_disease"
+                disease = convert_disease_label(model_type, disease)
                 
                 if len(image_bytes) == 0:
                     if not os.path.exists(f'errs.txt'):
@@ -130,7 +152,7 @@ def read_data(model_type, file_path, expected_photo_height, expected_photo_width
                         with open('errs.txt', 'a') as file:
                             file.write(f"{image_path}\n")
                 
-                if len(image_bytes) != 0 and disease in data.keys():
+                if len(image_bytes) != 0 and disease != None:
                     data[disease].append(image_bytes)
                     
     for key, value in data.items():
@@ -155,10 +177,10 @@ def balanced_data_split(model_type, data, test_train_split, random_state=42):
         x_data = value
         y_data = []
         
-        data = disease_classification_distribution(model_type, disease_to_category[key])
+        dist = disease_classification_distribution(model_type, disease_to_category[key])
         
         for _ in range(0, len(x_data)):
-            y_data.append(data)
+            y_data.append(dist)
     
         y_data = np.array(y_data)
         

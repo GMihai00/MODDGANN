@@ -14,7 +14,7 @@
                 "--epochs",
                 "50",
                 "--model_type",
-                "healthy-unhealthy",
+                "ensemble",
                 "--number_folds",
                 "5"
             ],

@@ -15,6 +15,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # to disable cuda
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
 import tensorflow as tf
 
 from training_callbacks import ImagePredictionLogger
@@ -70,6 +72,146 @@ def save_model(model, model_name):
 
 TRAINING_RESULTS = []
 
+MODEL_LAYERS = [
+    {
+        "model_type": "healthy-unhealthy",
+        "model_name": "InceptionV3"
+    },
+    {
+        "model_type":  "pharyngitis-tonsil_disease",
+        "model_name": "InceptionV3"
+    },
+    {
+        "model_type": "tonsillitis-mononucleosis",
+        "model_name": "VGG16"
+    }
+]
+
+def evaluate_ensemble_accuracy(models, x_test, y_test):
+    y_pred_labels = []
+    
+    for input in x_test:
+    
+        if input.ndim == 3:
+            input = np.expand_dims(input, axis=0)
+            print(f"Expanded input shape: {input.shape}")
+    
+        if input.shape[1:] != (EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1):
+            raise ValueError(f"Input shape mismatch, got {input.shape[1:]}")
+                
+        it = 0
+        prediction = -1
+        
+        while prediction == -1:
+        
+            output_prediction = models[it].predict(input)
+            disease_index = np.argmax(output_prediction, axis=0)
+            
+            output_prediction = output_prediction.flatten()
+            
+            disease_index = np.argmax(output_prediction)
+            
+            if disease_index == 0:
+                prediction = it
+                
+                # it = 0 healthy-unhealthy, 0 means healthy
+                # it = 1 pharyngitis_tonsil_disease, 1 means pharyngitis
+                # it = 2 tonsillitis_mononucleosis, 2 mean tonsillitis
+                
+            elif it == len(models) - 1:
+                prediction = it + 1   # it = 2 tonsillitis_mononucleosis, 3 means mononucleosis
+        
+                
+            it+=1
+            
+        y_pred_labels.append(prediction)
+    
+    y_labels = np.argmax(y_test, axis=1) 
+    
+    accuracy = accuracy_score(y_labels, y_pred_labels)
+    precision = precision_score(y_labels, y_pred_labels, average='weighted')  
+    recall = recall_score(y_labels, y_pred_labels, average='weighted')
+    
+    
+    TRAINING_RESULTS.append([None, accuracy, precision, recall])
+
+
+def match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test):
+        
+    y_train_specific = []
+    y_valid_specific = []
+    y_test_specific = []
+    x_train_specific = []
+    x_valid_specific = []
+    x_test_specific = []
+    
+    for x, y in zip(x_train, y_train):
+        new_y = convert_model_distribution("ensemble", model_type, y)
+        if new_y != None:
+            y_train_specific.append(new_y)
+            x_train_specific.append(x)
+        
+    for x, y in zip(x_valid, y_valid):
+        new_y = convert_model_distribution("ensemble", model_type, y)
+        if new_y != None:
+            y_valid_specific.append(new_y)
+            x_valid_specific.append(x)
+        
+    for x, y in zip(x_test, y_test):
+        new_y = convert_model_distribution("ensemble", model_type, y)
+        if new_y != None:
+            y_test_specific.append(new_y)
+            x_test_specific.append(x)
+    
+    return x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific
+
+def get_data_diseases(model_type, y_train, y_valid, y_test):
+
+    entries = y_train + y_valid + y_test
+    
+    data = {
+    }
+    
+    for disease in get_disease_to_category(model_type).keys():
+        data[disease] = 0
+
+    for entry in entries:
+        data[distribution_to_label(model_type, entry)] += 1
+    
+    return data
+
+def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test):
+    
+    k_fold_models = []
+    
+    for entry in MODEL_LAYERS:
+        model_type = entry["model_type"]
+        print(f"Training model: {model_type}")
+        
+        x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific = match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test)
+        
+        logging.info(f"Train: {len(x_train_specific)} Test: {len(x_test_specific)} Validate: {len(x_valid_specific)}") 
+        
+        data = get_data_diseases(model_type, y_train_specific, y_test_specific, y_valid_specific)
+        
+        for key, value in data.items():
+            logging.info(f"{key}: {value}")
+        
+        k_fold_sub_models = K_fold_train_model(k, model_type, entry["model_name"], train_epochs, batch_size, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
+        k_fold_models.append(k_fold_sub_models)
+        
+        display_training_results(TRAINING_RESULTS)
+        
+        print("....................................................................................................\n\n")
+        TRAINING_RESULTS.clear()
+    
+    # group models from the same fold together to form the ensemble for each fold
+    k_fold_model_groups = list(zip(*k_fold_models))
+    
+    for model_group in k_fold_model_groups:
+        evaluate_ensemble_accuracy(model_group, x_test, y_test)
+    
+
 def train_model(model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test):
     
     log_dir = get_log_dir(model_name)
@@ -86,6 +228,7 @@ def train_model(model_type, model_name, train_epochs, batch_size, x_train, y_tra
     
     TRAINING_RESULTS.append(results)
     
+    return model
     # save_model_weights(model, model_name)
 
 def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_train, _y_train, _x_valid, _y_valid, x_test, y_test, random_state=42):
@@ -96,6 +239,8 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_t
     y_train = np.concatenate((_y_train, _y_valid), axis=0)
     
     skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=random_state)
+    
+    k_fold_models = []
     
     for train_index, val_index in skf.split(x_train, np.argmax(y_train, axis=1)): 
         x_fold_train, x_fold_val = x_train[train_index], x_train[val_index]
@@ -114,6 +259,8 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_t
         results = model.evaluate(x_test,  y_test, verbose=0)
         training_results_k_fold.append(results)
         
+        k_fold_models.append(model)
+        
     display_training_results(training_results_k_fold)
     
     metrics_array = np.array(training_results_k_fold)
@@ -121,15 +268,17 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_t
     
     TRAINING_RESULTS.append(mean_metrics.tolist())
     
+    return k_fold_models
+    
 def display_training_results(training_results):
 
     for i, metrics in enumerate(training_results):
-        logging.info(f"Iteration {i + 1}: Loss: {metrics[0]:.4f}, Accuracy: {metrics[1]:.4f}, Precision: {metrics[2]:.4f}, Recall: {metrics[3]:.4f}")
+        logging.info(f"Iteration {i + 1}: Loss: {metrics[0] if metrics[0] is not None else 'Unavailable'}, Accuracy: {metrics[1]:.4f}, Precision: {metrics[2]:.4f}, Recall: {metrics[3]:.4f}")
     
     metrics_array = np.array(training_results)
     mean_metrics = np.mean(metrics_array, axis=0)
 
-    logging.info(f"Mean Loss: {mean_metrics[0]:.4f} Mean Accuracy: {mean_metrics[1]:.4f} Mean Precision: {mean_metrics[2]:.4f} Mean Recall: {mean_metrics[3]:.4f}")
+    logging.info(f"Mean Loss: {metrics[0] if metrics[0] is not None else 'Unavailable'} Mean Accuracy: {mean_metrics[1]:.4f} Mean Precision: {mean_metrics[2]:.4f} Mean Recall: {mean_metrics[3]:.4f}")
 
 def main():
     logging.debug(tf.config.list_physical_devices('GPU'))
@@ -176,11 +325,14 @@ def main():
     
     for _ in range (0, training_sample):
         x_train, y_train, x_valid, y_valid, x_test, y_test = stratified_data_split(model_type, data, train_rest_split)
-    
-        if number_folds != None:
+        
+        logging.info(f"Train: {len(x_train)} Test: {len(x_test)} Validate: {len(x_valid)}")  
+                    
+        if model_type == "ensemble" and number_folds != None:
+            K_fold_train_ensemble_model(number_folds, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
+        elif number_folds != None:
             K_fold_train_model(number_folds, model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
-        else:
-            logging.info(f"Train: {len(x_train)} Test: {len(x_test)} Validate: {len(x_valid)}")   
+        else: 
             train_model(model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
         
     display_training_results(TRAINING_RESULTS)
