@@ -27,13 +27,26 @@ import models
 
 from sklearn.model_selection import StratifiedKFold
 
-def get_log_dir(model_name):
+def get_log_dir(model_type, model_name, fold=None):
     if not hasattr(get_log_dir, 'call_count'):
-        get_log_dir.call_count = 0
+        get_log_dir.call_count = {}
         
-    get_log_dir.call_count += 1
+    if model_name not in get_log_dir.call_count:
+        get_log_dir.call_count[model_type] = 0
+        
+    get_log_dir.call_count[model_type] += 1
     
-    return "logs/" + model_name + ": Iteration_" + str(get_log_dir.call_count) + ": Time " + datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
+    log_dir = os.path.join("logs", model_type)
+
+    os.makedirs(log_dir, exist_ok=True)
+    
+    if fold != None:
+        log_dir = os.path.join(log_dir, f"fold_{fold}")
+        os.makedirs(log_dir, exist_ok=True)
+    
+    iteration = get_log_dir.call_count[model_type]
+    
+    return os.path.join(log_dir, f"{model_name}: Iteration_{iteration}: Time {datetime.datetime.now().strftime('%Y.%m.%d-%H:%M:%S')}")
 
 def define_model(model_type, model_name, load_weights=True):
 
@@ -215,7 +228,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
 
 def train_model(model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test):
     
-    log_dir = get_log_dir(model_name)
+    log_dir = get_log_dir(model_type, model_name)
     
     train_callbacks = []
     train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
@@ -243,11 +256,14 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_t
     
     k_fold_models = []
     
+    nr_fold = 0
+    
     for train_index, val_index in skf.split(x_train, np.argmax(y_train, axis=1)): 
         x_fold_train, x_fold_val = x_train[train_index], x_train[val_index]
         y_fold_train, y_fold_val = y_train[train_index], y_train[val_index]
         
-        log_dir = get_log_dir(model_name)
+        nr_fold += 1
+        log_dir = get_log_dir(model_type, model_name, nr_fold)
     
         train_callbacks = []
         train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
