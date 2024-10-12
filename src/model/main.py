@@ -186,6 +186,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
     
     for entry in MODEL_LAYERS:
         model_type = entry["model_type"]
+        model_name = entry["model_name"]
         print(f"Training model: {model_type}")
         
         x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific = match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test)
@@ -197,7 +198,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
         for key, value in data.items():
             logging.info(f"{key}: {value}")
         
-        k_fold_sub_models = K_fold_train_model(k, model_type, entry["model_name"], train_epochs, batch_size, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
+        k_fold_sub_models = K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
         k_fold_models.append(k_fold_sub_models)
         
         display_training_results(TRAINING_RESULTS)
@@ -271,14 +272,28 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_t
     return k_fold_models
     
 def display_training_results(training_results):
-
-    for i, metrics in enumerate(training_results):
-        logging.info(f"Iteration {i + 1}: Loss: {metrics[0] if metrics[0] is not None else 'Unavailable'}, Accuracy: {metrics[1]:.4f}, Precision: {metrics[2]:.4f}, Recall: {metrics[3]:.4f}")
     
-    metrics_array = np.array(training_results)
-    mean_metrics = np.mean(metrics_array, axis=0)
-
-    logging.info(f"Mean Loss: {metrics[0] if metrics[0] is not None else 'Unavailable'} Mean Accuracy: {mean_metrics[1]:.4f} Mean Precision: {mean_metrics[2]:.4f} Mean Recall: {mean_metrics[3]:.4f}")
+    if len(training_results) == 0:
+        return
+    
+    if any(metrics[0] is None for metrics in training_results):
+        filtered_results = [metrics[1:] for metrics in training_results]
+        for i, metrics in enumerate(filtered_results):
+            logging.info(f"Iteration {i + 1}: Accuracy: {metrics[0]:.4f}, Precision: {metrics[1]:.4f}, Recall: {metrics[2]:.4f}")
+        
+        metrics_array = np.array(filtered_results)
+        mean_metrics = np.mean(metrics_array, axis=0)
+    
+        logging.info(f"Mean Accuracy: {mean_metrics[0]:.4f} Mean Precision: {mean_metrics[1]:.4f} Mean Recall: {mean_metrics[2]:.4f}")
+        
+    else: 
+        for i, metrics in enumerate(training_results):
+            logging.info(f"Iteration {i + 1}: Loss: {metrics[0]:.4f}, Accuracy: {metrics[1]:.4f}, Precision: {metrics[2]:.4f}, Recall: {metrics[3]:.4f}")
+        
+        metrics_array = np.array(training_results)
+        mean_metrics = np.mean(metrics_array, axis=0)
+    
+        logging.info(f"Mean Loss: {mean_metrics[0]:.4f} Mean Accuracy: {mean_metrics[1]:.4f} Mean Precision: {mean_metrics[2]:.4f} Mean Recall: {mean_metrics[3]:.4f}")
 
 def main():
     logging.debug(tf.config.list_physical_devices('GPU'))
