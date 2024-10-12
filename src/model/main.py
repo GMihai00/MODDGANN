@@ -31,7 +31,7 @@ def get_log_dir(model_type, model_name, fold=None):
     if not hasattr(get_log_dir, 'call_count'):
         get_log_dir.call_count = {}
         
-    if model_name not in get_log_dir.call_count:
+    if model_type not in get_log_dir.call_count:
         get_log_dir.call_count[model_type] = 0
         
     get_log_dir.call_count[model_type] += 1
