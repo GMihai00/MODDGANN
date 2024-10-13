@@ -402,7 +402,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/21.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/personal_photos/6.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/33.png,healthy
-/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/46.png,mononucleosis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-215-_jpg.rf.86451c16093a1e62b553e4bde5feee24.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/pharyngitis/3.png,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/253.png,healthy
@@ -420,7 +419,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/75.png,mononucleosis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/34.png,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/133.png,healthy
-/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/78.png,mononucleosis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/pharyngitis/16.png,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/5.png,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/16.png,healthy
@@ -456,7 +454,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/77.png,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/81.png,mononucleosis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/3.png,mononucleosis
-/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/62.png,mononucleosis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/303.png,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-191-_JPG_jpg.rf.96729ed78fab49f37ea15fb0321efee9.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/2.png,healthy
@@ -507,7 +504,6 @@ Path,Disease
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/34.png,mononucleosis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-80-_JPG_jpg.rf.4596f3f09eb28e36609f5b0755082a81.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/google/mononucleosis/69.png,mononucleosis
-/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/kaggle/22.jpg,tonsillitis
 /home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-78-_JPG_jpg.rf.9d3c8055619daf028c4d764e36d1ae7d.jpg,pharyngitis
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/419.png,healthy
 /home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/7.png,healthy
