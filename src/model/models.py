@@ -12,20 +12,18 @@ def AlteredInceptionV3(input_shape, output_shape):
         include_top=False,
         weights="imagenet"
     )
-    
-    # Optionally freeze the base model layers
-    for layer in base_model.layers:
-        layer.trainable = False
 
     # Add new layers on top of the base model
-    x = base_model.output
+    x = base_model.output  # Use output of the base model
+    
     x = GlobalAveragePooling2D()(x)
-    x = BatchNormalization()(x)  # Optional batch normalization
-    x = Dense(1024, activation='relu')(x)  # Example additional Dense layer
-    x = BatchNormalization()(x)  # Optional batch normalization
-    x = Dense(512, activation='relu')(x)  # Example additional Dense layer
-    x = Dense(output_shape, activation='softmax')(x)  # Final classification layer
-
+    
+    # Optional dense layers after global pooling
+    x = Dense(512, activation='relu')(x)
+    x = BatchNormalization()(x)
+    
+    # Output layer
+    x = Dense(output_shape, activation='softmax')(x)
     # Create the new model
     model = Model(inputs=base_model.input, outputs=x)
 

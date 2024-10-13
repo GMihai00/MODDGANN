@@ -49,7 +49,7 @@ def get_log_dir(model_type, model_name, fold=None):
     
     return os.path.join(log_dir, f"{model_name}: Iteration_{iteration}: Time {datetime.datetime.now().strftime('%Y.%m.%d-%H:%M:%S')}")
 
-def define_model(model_type, model_name, load_weights=True):
+def define_model(model_type, model_name, load_weights=True, learning_rate=0.001):
 
     input_shape = (EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
     
@@ -58,9 +58,7 @@ def define_model(model_type, model_name, load_weights=True):
     WEIGHTS_BACKUP  = model_name + ".weights.h5"
     
     model.compile(
-        optimizer='adam',
-        # # for bigger jumps, in case of stuck in plato zone for to long, applied to last model
-        # optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
         loss='categorical_crossentropy',
         metrics=[
             'accuracy',
@@ -93,8 +91,9 @@ MODEL_LAYERS = [
     },
     {
         "model_type":  "pharyngitis-tonsil_disease",
-        "model_name": "InceptionV3",
-        "epochs": 75
+        "model_name": "AlteredInceptionV3",
+        "batch_size": "16",
+        "learning_rate": "0.00005"
     },
     {
         "model_type": "tonsillitis-mononucleosis",
@@ -195,14 +194,16 @@ def get_data_diseases(model_type, y_train, y_valid, y_test):
     
     return data
 
-def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test):
+def K_fold_train_ensemble_model(k, train_epochs, batch_size, learning_rate, x_train, y_train, x_valid, y_valid, x_test, y_test):
     
     k_fold_models = []
     
     for entry in MODEL_LAYERS:
         model_type = entry["model_type"]
         model_name = entry["model_name"]
-        model_train_epochs = entry.ge("epochs", train_epochs)
+        model_train_epochs = entry.get("epochs", train_epochs)
+        model_batch_size = entry.get("batch_size", batch_size)
+        model_learning_rate = entry.get("learning_rate", learning_rate)
         print(f"Training model: {model_type}")
         
         x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific = match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test)
@@ -214,7 +215,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
         for key, value in data.items():
             logging.info(f"{key}: {value}")
         
-        k_fold_sub_models = K_fold_train_model(k, model_type, model_name, model_train_epochs, batch_size, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
+        k_fold_sub_models = K_fold_train_model(k, model_type, model_name, model_train_epochs, model_batch_size, model_learning_rate, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
         k_fold_models.append(k_fold_sub_models)
         
         display_training_results(TRAINING_RESULTS)
@@ -229,7 +230,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
         evaluate_ensemble_accuracy(model_group, x_test, y_test)
     
 
-def train_model(model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test):
+def train_model(model_type, model_name, train_epochs, batch_size, learning_rate, x_train, y_train, x_valid, y_valid, x_test, y_test):
     
     log_dir = get_log_dir(model_type, model_name)
     
@@ -237,7 +238,7 @@ def train_model(model_type, model_name, train_epochs, batch_size, x_train, y_tra
     train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
     train_callbacks.append(ImagePredictionLogger(model_type, (x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
 
-    model = define_model(model_type, model_name, False)
+    model = define_model(model_type, model_name, False, learning_rate)
     
     model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_valid,  y_valid), callbacks=train_callbacks)
     
@@ -248,7 +249,7 @@ def train_model(model_type, model_name, train_epochs, batch_size, x_train, y_tra
     return model
     # save_model_weights(model, model_name)
 
-def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_train, _y_train, _x_valid, _y_valid, x_test, y_test, random_state=42):
+def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, learning_rate, _x_train, _y_train, _x_valid, _y_valid, x_test, y_test, random_state=42):
     
     training_results_k_fold = []
     
@@ -272,7 +273,7 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, _x_t
         train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
         train_callbacks.append(ImagePredictionLogger(model_type, (x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
         
-        model = define_model(model_type, model_name, False)
+        model = define_model(model_type, model_name, False, learning_rate)
                 
         model.fit(x_fold_train, y_fold_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_fold_val,  y_fold_val), callbacks=train_callbacks)
     
@@ -328,6 +329,7 @@ def main():
     parser.add_argument("--model_type", type=str, help="Type of model to use. Options: \"healthy-unhealthy\"; \"pharyngitis-tonsil_disease\"; \"tonsillitis-mononucleosis\"; \"ensemble\"")
     parser.add_argument("--training_sample", type=int, help="Number of train-test iterations", default=1)
     parser.add_argument("--number_folds", type=int, help="Number of folds for cross-validation", required=False)
+    parser.add_argument("--learning_rate", type=float, help="Optimizer learning rate", default=0.001)
     
     args = parser.parse_args()
     
@@ -338,6 +340,7 @@ def main():
     train_rest_split = args.train_rest_split
     model_type = args.model_type
     training_sample = args.training_sample
+    learning_rate = args.learning_rate
     
     number_folds = None
     if hasattr(args, 'number_folds'):
@@ -364,11 +367,11 @@ def main():
         logging.info(f"Train: {len(x_train)} Test: {len(x_test)} Validate: {len(x_valid)}")  
                     
         if model_type == "ensemble" and number_folds != None:
-            K_fold_train_ensemble_model(number_folds, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
+            K_fold_train_ensemble_model(number_folds, train_epochs, batch_size, learning_rate, x_train, y_train, x_valid, y_valid, x_test, y_test)
         elif number_folds != None:
-            K_fold_train_model(number_folds, model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
+            K_fold_train_model(number_folds, model_type, model_name, train_epochs, batch_size, learning_rate, x_train, y_train, x_valid, y_valid, x_test, y_test)
         else: 
-            train_model(model_type, model_name, train_epochs, batch_size, x_train, y_train, x_valid, y_valid, x_test, y_test)
+            train_model(model_type, model_name, train_epochs, batch_size, learning_rate, x_train, y_train, x_valid, y_valid, x_test, y_test)
         
     display_training_results(TRAINING_RESULTS)
     
