@@ -97,7 +97,9 @@ MODEL_LAYERS = [
     },
     {
         "model_type": "tonsillitis-mononucleosis",
-        "model_name": "VGG16"
+        "model_name": "VGG16",
+        "learning_rate": "0.0001",
+        "batch_size": "16",
     }
 ]
 
