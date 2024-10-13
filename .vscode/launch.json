@@ -10,15 +10,13 @@
                 "--input_data",
                 "/home/mgherghinescu/projects/TenserflowModelTraining/src/dataset_helpers/data.csv",
                 "--model_name",
-                "AlteredInceptionV3",
+                "InceptionV3",
                 "--epochs",
                 "50",
                 "--model_type",
-                "tonsillitis-mononucleosis",
+                "ensemble",
                 "--number_folds",
-                "5",
-                "--batch_size",
-                "8"
+                "5"
             ],
             "console": "integratedTerminal"
         }

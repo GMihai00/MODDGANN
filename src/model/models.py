@@ -2,7 +2,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Dropout,Conv2D, MaxPooling2D, Flatten, InputLayer, concatenate, GlobalAveragePooling2D, BatchNormalization
-
+from tensorflow.keras.regularizers import l2
 
 def NASNetMobile(input_shape, output_shape):
     base_model = tf.keras.applications.NASNetMobile(input_shape = input_shape, include_top = True, weights = None, classes = output_shape, classifier_activation='softmax')
@@ -13,7 +13,6 @@ def Xception(input_shape, output_shape):
     
     return base_model
     
-# overfitting. Need something in between VGG16 and InceptionV3
 def AlteredInceptionV3(input_shape, output_shape):
     # Load InceptionV3 without the top classification layer
     base_model = tf.keras.applications.InceptionV3(
@@ -54,14 +53,40 @@ def AlteredEfficientNetB0(input_shape, output_shape):
     base_model = tf.keras.applications.EfficientNetB0(weights='imagenet', include_top=False, input_shape=input_shape)
     
     x = base_model.output
-    x = GlobalAveragePooling2D()(x)  # Global pooling layer
-    x = Dropout(0.5)(x)              # Add a dropout layer to prevent overfitting
-    x = Dense(128, activation='relu')(x)  # Dense layer with ReLU activation
-    x = BatchNormalization()(x)
-    x = Dense(output_shape, activation='softmax')(x)
     
-    model = Model(inputs=base_model.input, outputs=x)
-
+    # Add additional convolutional layers to further extract features
+    x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    
+    x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    
+    # Global pooling layer to reduce the dimensionality before dense layers
+    x = GlobalAveragePooling2D()(x)
+    
+    # First dense layer with more units and batch normalization
+    x = Dense(512, activation='relu', kernel_regularizer=l2(0.001))(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.4)(x)
+    
+    # Second dense layer with increased units
+    x = Dense(256, activation='relu', kernel_regularizer=l2(0.001))(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.4)(x)
+    
+    # Third dense layer
+    x = Dense(128, activation='relu', kernel_regularizer=l2(0.001))(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.3)(x)
+    
+    # Output layer for classification
+    output = Dense(output_shape, activation='softmax')(x)
+    
+    # Create the final model
+    model = Model(inputs=base_model.input, outputs=output)
+    
     return model
 
 # only works with RGB images
@@ -112,19 +137,13 @@ def EfficientNetV2M(input_shape, output_shape):
     return Model(inputs=base_model.input, outputs=predictions)
     
 def VGG19(input_shape, output_shape):
-    base_model = tf.keras.applications.VGG19(weights='imagenet', include_top=False, input_shape=input_shape)
-    # for layer in base_model.layers:
-    #     layer.trainable = False
+    base_model = tf.keras.applications.VGG16(weights='imagenet', include_top=False, input_shape=input_shape)
+    for layer in base_model.layers:
+        layer.trainable = False
         
-    x = base_model.output  # Use output of the base model
+    x = base_model.output
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)
+    x = tf.keras.layers.Dense(1024, activation='relu')(x)
+    predictions = tf.keras.layers.Dense(output_shape, activation='softmax')(x) 
     
-    x = GlobalAveragePooling2D()(x)
-    
-    # Optional dense layers after global pooling
-    x = Dense(512, activation='relu')(x)
-    x = BatchNormalization()(x)
-    
-    # Output layer
-    x = Dense(output_shape, activation='softmax')(x)
-        
-    return Model(inputs=base_model.input, outputs=x)
+    return Model(inputs=base_model.input, outputs=predictions)
