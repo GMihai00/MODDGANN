@@ -93,7 +93,8 @@ MODEL_LAYERS = [
     },
     {
         "model_type":  "pharyngitis-tonsil_disease",
-        "model_name": "InceptionV3"
+        "model_name": "InceptionV3",
+        "epochs": 75
     },
     {
         "model_type": "tonsillitis-mononucleosis",
@@ -201,6 +202,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
     for entry in MODEL_LAYERS:
         model_type = entry["model_type"]
         model_name = entry["model_name"]
+        model_train_epochs = entry.ge("epochs", train_epochs)
         print(f"Training model: {model_type}")
         
         x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific = match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test)
@@ -212,7 +214,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, x_train, y_train, x
         for key, value in data.items():
             logging.info(f"{key}: {value}")
         
-        k_fold_sub_models = K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
+        k_fold_sub_models = K_fold_train_model(k, model_type, model_name, model_train_epochs, batch_size, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
         k_fold_models.append(k_fold_sub_models)
         
         display_training_results(TRAINING_RESULTS)
