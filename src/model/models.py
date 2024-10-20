@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Dropout,Conv2D, MaxPooling2D, Flatten, InputLayer, concatenate, GlobalAveragePooling2D, BatchNormalization
 from tensorflow.keras.regularizers import l2
+from tensorflow.keras.layers import LeakyReLU
 
 def NASNetMobile(input_shape, output_shape):
     base_model = tf.keras.applications.NASNetMobile(input_shape = input_shape, include_top = True, weights = None, classes = output_shape, classifier_activation='softmax')
@@ -27,7 +28,7 @@ def AlteredInceptionV3(input_shape, output_shape):
     x = GlobalAveragePooling2D()(x)
     
     # Optional dense layers after global pooling
-    x = Dense(512, activation='relu')(x)
+    x = Dense(512, activation=LeakyReLU(alpha=0.1))(x)
     x = BatchNormalization()(x)
     
     # Output layer
