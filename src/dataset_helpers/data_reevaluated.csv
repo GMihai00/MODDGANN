@@ -1,5 +1,0 @@
-Path,Disease
-/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/3/nopharyngitis-115-_JPG_jpg.rf.1be28e4ed5c80a67427b69ef068264c4.jpg,pharyngitis
-/home/mgherghinescu/projects/TenserflowModelTraining/bucal_cavity_diseases_dataset/train/2/61d4c49a-d128-4753-88dd-b86539cd1f45_jpg.rf.99cf4fcd8a88442f1debab171f0c7fa2.jpg,tonsillitis
-/home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/398.png,healthy
-/home/mgherghinescu/projects/TenserflowModelTraining/src/model/gann/generated_images/298.png,healthy
