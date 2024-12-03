@@ -18,6 +18,10 @@ halethy oral cavity images. The dataset used for training as well as the artific
 
 Install python 3.10 https://www.python.org/downloads/
 
+Install VS Code https://code.visualstudio.com/
+
+Install code runner + python extensions
+
 Create a virtual environment
 
 ```ps1
@@ -41,12 +45,36 @@ As for the labeling, it can be found under  "src/dataset_helpers/data.csv" that 
 
 
 ## GANN
-TO DO
+Under ".vscode" folder rename "launch_gan.json" to "launch.json". Replace "/home/gmihai00/Repos/TenserflowModelTraining/src/dataset_helpers/data.csv" with the path to the labels file.
+
+Run the launch file using the vs extension. This will start training the gann from scratch, running 10000 epochs, using a batch size of 400. You can change this paramaeters, please run the following command for further assistence
+```ps1
+python ./src/model/gann/app.py --help
+```
 
 ## Ensemble Model
-TO DO
+Under ".vscode" folder rename "launch_model.json" to "launch.json". Replace "/home/gmihai00/Repos/TenserflowModelTraining/src/dataset_helpers/data.csv" with the path to the labels file.
+
+Run the launch file using the vs extension. This will start training the ensemble from scrath, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
+```ps1
+python ./src/model/main.py --help
+```
 
 ## Visualizing training results
+
+To vizualize the data you will need tensorboard installed. To vizualize your training results you can run:
+
+```ps1
+chmod +X ./src/model/display_rez.sh
+ ./src/model/display_rez.sh
+```
+
+To view the results that the authors achieved please run
+
+```ps1
+tensorboard --logdir ./src/model/final_result_logs
+```
+
 
 ## License
 
