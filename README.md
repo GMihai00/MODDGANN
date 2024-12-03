@@ -28,6 +28,8 @@ Actibate + install requirements
 ```ps1
 chmod +x ./bin/activate
 
+source ./bin/activate
+
 pip install -r requirements.txt
 ```
 
