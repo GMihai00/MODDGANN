@@ -7,13 +7,44 @@ halethy oral cavity images. The dataset used for training as well as the artific
 
 # Table of content
 
-TO DO
 1. [Setting up the environment](#setting-up-the-environment)
-2. [License](#license)
+2. [Dataset](#dataset)
+3. [GANN](#gann)
+4. [Ensemble Model](#ensemble-model)
+5. [Visualizing training results](#visualizing-training-results)
+6. [License](#license)
 
 ## Setting up the environment
 
+Install python 3.10 https://www.python.org/downloads/
 
+Create a virtual environment
+
+```ps1
+python -m venv .vevn
+```
+Actibate + install requirements
+
+```ps1
+chmod +x ./bin/activate
+
+pip install -r requirements.txt
+```
+
+## Dataset
+
+Dataset images are spread across multiple folders of the repo. You can find the images under folder "bucal_cavity_diseases_dataset". 
+
+As for the labeling, it can be found under  "src/dataset_helpers/data.csv" that contains the path to the image and the label considering that the current repo directory is "/home/gmihai00/Repos/TenserflowModelTraining/". The absolute path that makes the csv unportable is a current limitation of the implementation, planning to remove it in the future.
+
+
+## GANN
+TO DO
+
+## Ensemble Model
+TO DO
+
+## Visualizing training results
 
 ## License
 
