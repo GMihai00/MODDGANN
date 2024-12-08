@@ -97,8 +97,9 @@ TRAINING_RESULTS = []
 MODEL_LAYERS = [
     {
         "model_type": "healthy-unhealthy",
-        "model_name": "InceptionV3",
+        "model_name": "AlteredInceptionV3",
         "epochs": 40,
+        "batch_size": 16,
         "learning_rate": 0.0008
     },
     {
@@ -109,8 +110,8 @@ MODEL_LAYERS = [
     },
     {
         "model_type": "tonsillitis-mononucleosis",
-        "model_name": "VGG19",
-        "learning_rate": 0.005,
+        "model_name": "AlteredInceptionV3",
+        "learning_rate": 0.0008,
         "batch_size": 16,
         "epochs": 30
     }
