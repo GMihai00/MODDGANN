@@ -16,7 +16,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # to disable cuda
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
 
 import tensorflow as tf
 
@@ -27,6 +27,8 @@ from data_processing_helpers import *
 import models
 
 from sklearn.model_selection import StratifiedKFold
+
+from evaluation import *
 
 def get_log_dir(model_type, model_name, fold=None):
     if not hasattr(get_log_dir, 'call_count'):
@@ -49,6 +51,7 @@ def get_log_dir(model_type, model_name, fold=None):
     
     return os.path.join(log_dir, f"{model_name}: Iteration_{iteration}: Time {datetime.datetime.now().strftime('%Y.%m.%d-%H:%M:%S')}")
 
+cnt = 0
 def define_model(model_type, model_name, load_weights=True, learning_rate=0.001):
 
     input_shape = (EXPECTED_PHOTO_WIDTH, EXPECTED_PHOTO_HEIGHT, 3 if IS_RGB else 1)
@@ -57,13 +60,18 @@ def define_model(model_type, model_name, load_weights=True, learning_rate=0.001)
         
     WEIGHTS_BACKUP  = model_name + ".weights.h5"
     
+    if not hasattr(define_model, "cnt"):
+        model.summary()
+        define_model.cnt = 0
+    
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
         loss='categorical_crossentropy',
         metrics=[
             'accuracy',
             tf.keras.metrics.Precision(name='precision'),
-            tf.keras.metrics.Recall(name='recall')
+            tf.keras.metrics.Recall(name='recall'),
+            tf.keras.metrics.AUC(name='auc')
         ]
     )
     
@@ -147,13 +155,8 @@ def evaluate_ensemble_accuracy(models, x_test, y_test):
     
     y_labels = np.argmax(y_test, axis=1) 
     
-    accuracy = accuracy_score(y_labels, y_pred_labels)
-    precision = precision_score(y_labels, y_pred_labels, average='weighted')  
-    recall = recall_score(y_labels, y_pred_labels, average='weighted')
     
-    
-    TRAINING_RESULTS.append([None, accuracy, precision, recall])
-
+    TRAINING_RESULTS.append(ClassificationPerformanceMetrics(y_test, y_labels))
 
 def match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test):
         
@@ -247,9 +250,9 @@ def train_model(model_type, model_name, train_epochs, batch_size, learning_rate,
     
     model.fit(x_train, y_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_valid,  y_valid), callbacks=train_callbacks)
     
-    results = model.evaluate(x_test,  y_test, verbose=0)
+    y_labels = model.predict(x_test)
     
-    TRAINING_RESULTS.append(results)
+    TRAINING_RESULTS.append(ClassificationPerformanceMetrics(y_test, y_labels))
     
     return model
     # save_model_weights(model, model_name)
@@ -283,43 +286,20 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, lear
         model.fit(x_fold_train, y_fold_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_fold_val,  y_fold_val), callbacks=train_callbacks)
     
         results = model.evaluate(x_test,  y_test, verbose=0)
-        training_results_k_fold.append(results)
+        
+        y_pred = model.predict(x_test)
+        training_results_k_fold.append(ClassificationPerformanceMetrics(y_test, y_pred))
         
         k_fold_models.append(model)
         
     display_training_results(training_results_k_fold)
     
-    metrics_array = np.array(training_results_k_fold)
-    mean_metrics = np.mean(metrics_array, axis=0)
+    mean_metric = calculate_metrics_average(training_results_k_fold)
     
-    TRAINING_RESULTS.append(mean_metrics.tolist())
+    TRAINING_RESULTS.append(mean_metric)
     
     return k_fold_models
     
-def display_training_results(training_results):
-    
-    if len(training_results) == 0:
-        return
-    
-    if any(metrics[0] is None for metrics in training_results):
-        filtered_results = [metrics[1:] for metrics in training_results]
-        for i, metrics in enumerate(filtered_results):
-            logging.info(f"Iteration {i + 1}: Accuracy: {metrics[0]:.4f}, Precision: {metrics[1]:.4f}, Recall: {metrics[2]:.4f}")
-        
-        metrics_array = np.array(filtered_results)
-        mean_metrics = np.mean(metrics_array, axis=0)
-    
-        logging.info(f"Mean Accuracy: {mean_metrics[0]:.4f} Mean Precision: {mean_metrics[1]:.4f} Mean Recall: {mean_metrics[2]:.4f}")
-        
-    else: 
-        for i, metrics in enumerate(training_results):
-            logging.info(f"Iteration {i + 1}: Loss: {metrics[0]:.4f}, Accuracy: {metrics[1]:.4f}, Precision: {metrics[2]:.4f}, Recall: {metrics[3]:.4f}")
-        
-        metrics_array = np.array(training_results)
-        mean_metrics = np.mean(metrics_array, axis=0)
-    
-        logging.info(f"Mean Loss: {mean_metrics[0]:.4f} Mean Accuracy: {mean_metrics[1]:.4f} Mean Precision: {mean_metrics[2]:.4f} Mean Recall: {mean_metrics[3]:.4f}")
-
 def main():
     start_time = time.time()
     logging.debug(tf.config.list_physical_devices('GPU'))
