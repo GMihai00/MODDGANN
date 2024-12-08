@@ -101,10 +101,10 @@ def calculate_metrics_average(metrics_list: List[ClassificationPerformanceMetric
 def display_training_results(training_results: List[ClassificationPerformanceMetrics]):
     
     for it, metric in enumerate(training_results):
-        logging.info(f"Results for iteration: {it}: {str(metric)}")
+        logging.info(f"Results for iteration {it}: \n {str(metric)}")
     
     average_metrics = calculate_metrics_average(training_results)
     
-    logging.info(f"Average training results: {str(average_metrics)}")
+    logging.info(f"Average training results:\n {str(average_metrics)}")
     
     average_metrics.plot_roc_curve()
