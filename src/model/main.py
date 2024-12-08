@@ -231,7 +231,7 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, learning_rate, x_tr
         
         k_fold_sub_models = K_fold_train_model(k, model_type, model_name, model_train_epochs, model_batch_size, model_learning_rate, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
         
-        save_model_weights(k_fold_sub_models, model_type)
+        # save_model_weights(k_fold_sub_models, model_type)
         
         k_fold_models.append(k_fold_sub_models)
         
