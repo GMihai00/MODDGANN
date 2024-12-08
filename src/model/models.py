@@ -49,25 +49,31 @@ def AlteredTLInceptionV3(input_shape, output_shape, freeze_layers=True):
     
 def AlteredInceptionV3(input_shape, output_shape):
     # Load InceptionV3 without the top classification layer
+    
+    input_layer = Input(shape=input_shape)
+    
+    upsampled_input = Resizing(224, 224)(input_layer)
+    
     base_model = tf.keras.applications.InceptionV3(
-        input_shape=input_shape,
+        input_shape=upsampled_input.shape[1:],
         include_top=False,
         weights="imagenet"
     )
+    for layer in base_model.layers:
+        layer.trainable = False
 
     # Add new layers on top of the base model
-    x = base_model.output  # Use output of the base model
+    x = base_model(upsampled_input)   # Use output of the base model
     
     x = GlobalAveragePooling2D()(x)
     
     # Optional dense layers after global pooling
-    x = Dense(512, activation=LeakyReLU(alpha=0.1))(x)
-    x = BatchNormalization()(x)
+    x = Dense(1024, activation=LeakyReLU(alpha=0.1))(x)
     
     # Output layer
     x = Dense(output_shape, activation='softmax')(x)
     # Create the new model
-    model = Model(inputs=base_model.input, outputs=x)
+    model = Model(inputs=input_layer, outputs=x)
 
     return model
 
