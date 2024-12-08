@@ -1,7 +1,7 @@
 
 import tensorflow as tf
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Dropout,Conv2D, MaxPooling2D, Flatten, InputLayer, concatenate, GlobalAveragePooling2D, BatchNormalization
+from tensorflow.keras.layers import Dense, Dropout,Conv2D, MaxPooling2D, Flatten, InputLayer, concatenate, GlobalAveragePooling2D, BatchNormalization, Input,  Resizing
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.layers import LeakyReLU
 
@@ -13,6 +13,39 @@ def Xception(input_shape, output_shape):
     base_model = tf.keras.applications.Xception(input_shape = input_shape, include_top = True, weights = None, classes = output_shape, classifier_activation='softmax')
     
     return base_model
+    
+def AlteredTLInceptionV3(input_shape, output_shape, freeze_layers=True):
+    # Load InceptionV3 without the top classification layer
+    input_layer = Input(shape=input_shape)
+    
+    upsampled_input = Resizing(299, 299)(input_layer)
+    
+    base_model = tf.keras.applications.InceptionV3(
+        input_shape=upsampled_input.shape[1:],
+        include_top=False,
+        weights="imagenet"
+    )
+    
+    # Optionally freeze layers in the base model
+    if freeze_layers:
+        for layer in base_model.layers:
+            layer.trainable = False  # Freeze all layers in the base model
+    
+    # for layer in base_model.layers[-5:]:  # Unfreeze the last 20 layers
+    #     layer.trainable = True
+    
+    # Add new layers on top of the base model
+    x = base_model(upsampled_input)  # Use output of the base model
+    x = GlobalAveragePooling2D()(x)
+    x = Dense(128, activation=LeakyReLU(alpha=0.1))(x)
+    
+    # Output layer for classification
+    output = Dense(output_shape, activation='softmax')(x)
+    
+    # Create the new model
+    model = Model(inputs=input_layer, outputs=output)
+    
+    return model
     
 def AlteredInceptionV3(input_shape, output_shape):
     # Load InceptionV3 without the top classification layer
@@ -106,15 +139,39 @@ def InceptionV3(input_shape, output_shape):
     
     return base_model
 
-def ResNet50(input_shape, output_shape):
-    base_model = tf.keras.applications.ResNet50(input_shape = input_shape, include_top = True, weights = None, classes = output_shape, classifier_activation='softmax')
+def ResNet50V2(input_shape, output_shape, freeze_layers=True):
+    input_layer = Input(shape=input_shape)
     
-    return base_model
+    upsampled_input = Resizing(224, 224)(input_layer)
     
-def ResNet50V2(input_shape, output_shape):
-    base_model = tf.keras.applications.ResNet50V2(input_shape = input_shape, include_top = True, weights = None, classes = output_shape, classifier_activation='softmax')
+    base_model = tf.keras.applications.ResNet50V2(
+        input_shape=upsampled_input.shape[1:],
+        include_top=False,
+        weights="imagenet"
+    )
     
-    return base_model
+    # Optionally freeze layers in the base model
+    if freeze_layers:
+        for layer in base_model.layers:
+            layer.trainable = False  # Freeze all layers in the base model
+    
+    for layer in base_model.layers[-5:]: #
+        layer.trainable = True
+    
+    # Add new layers on top of the base model
+    x = base_model(upsampled_input)  # Use output of the base model
+    x = GlobalAveragePooling2D()(x)
+    x = Dense(1024, activation=LeakyReLU(alpha=0.1))(x)
+    # x = Dropout(0.1)(x)
+    # x = Dense(512, activation=LeakyReLU(alpha=0.1))(x)
+    
+    # Output layer for classification
+    output = Dense(output_shape, activation='softmax')(x)
+    
+    # Create the new model
+    model = Model(inputs=input_layer, outputs=output)
+    
+    return model
     
     
 def EfficientNetV2M(input_shape, output_shape):
@@ -123,16 +180,8 @@ def EfficientNetV2M(input_shape, output_shape):
         layer.trainable = False
         
     x = base_model.output
-    # x = tf.keras.layers.Conv2D(256, (3, 3), padding='same', activation='relu')(x)
-    # x = tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same')(x)
-    
-    # x = tf.keras.layers.Conv2D(512, (3, 3), padding='same', activation='relu')(x)
-    # x = tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same')(x)
-    
-    # x = tf.keras.layers.Conv2D(1024, (3, 3), padding='same', activation='relu')(x)
-    # x = tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same')(x)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    x = tf.keras.layers.Dense(2048, activation='relu')(x)
+    x = tf.keras.layers.Dense(128, activation='relu')(x)
     predictions = tf.keras.layers.Dense(output_shape, activation='softmax')(x) 
     
     return Model(inputs=base_model.input, outputs=predictions)

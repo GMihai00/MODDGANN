@@ -30,6 +30,8 @@ from sklearn.model_selection import StratifiedKFold
 
 from evaluation import *
 
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+
 def get_log_dir(model_type, model_name, fold=None):
     if not hasattr(get_log_dir, 'call_count'):
         get_log_dir.call_count = {}
@@ -245,6 +247,9 @@ def train_model(model_type, model_name, train_epochs, batch_size, learning_rate,
     train_callbacks = []
     train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
     train_callbacks.append(ImagePredictionLogger(model_type, (x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
+    train_callbacks.append(EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True))
+    train_callbacks.append(ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1))
+    # train_callbacks.append(ModelCheckpoint('best_model.h5', monitor='val_loss', save_best_only=True))
 
     model = define_model(model_type, model_name, False, learning_rate)
     
@@ -280,7 +285,9 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, lear
         train_callbacks = []
         train_callbacks.append(tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, write_graph=True))
         train_callbacks.append(ImagePredictionLogger(model_type, (x_test, y_test), log_dir + "/prediction", train_epochs, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB))
-        
+        train_callbacks.append(EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True))
+        train_callbacks.append(ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1))
+        # train_callbacks.append(ModelCheckpoint('best_model.h5', monitor='val_loss', save_best_only=True))
         model = define_model(model_type, model_name, False, learning_rate)
                 
         model.fit(x_fold_train, y_fold_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_fold_val,  y_fold_val), callbacks=train_callbacks)
