@@ -154,7 +154,10 @@ def evaluate_ensemble_accuracy(models, x_test, y_test):
                 
             it+=1
             
-        y_pred_labels.append(prediction)
+        y_pred_one_hot = np.zeros_like(y_test)
+        y_pred_one_hot[np.arange(len(y_test)), prediction] = 1
+            
+        y_pred_labels.append(y_pred_one_hot)
     
     y_labels = np.argmax(y_test, axis=1) 
     
