@@ -154,15 +154,18 @@ def evaluate_ensemble_accuracy(models, x_test, y_test):
                 
             it+=1
             
-        y_pred_one_hot = np.zeros_like(y_test)
-        y_pred_one_hot[np.arange(len(y_test)), prediction] = 1
-            
+        y_pred_one_hot = np.zeros(4)
+        y_pred_one_hot[prediction] = 1
+        
         y_pred_labels.append(y_pred_one_hot)
+
     
-    y_labels = np.argmax(y_test, axis=1) 
+    # y_labels = np.argmax(y_test, axis=1) 
     
+    y_pred_labels = np.array(y_pred_labels)
+    print(y_pred_labels.shape)
     
-    TRAINING_RESULTS.append(ClassificationPerformanceMetrics(y_test, y_labels))
+    TRAINING_RESULTS.append(ClassificationPerformanceMetrics(y_test, y_pred_labels))
 
 def match_model_labels(model_type, x_train, y_train, x_valid, y_valid, x_test, y_test):
         
