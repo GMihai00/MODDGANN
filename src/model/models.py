@@ -90,43 +90,31 @@ def VGG16(input_shape, output_shape):
     return Model(inputs=base_model.input, outputs=predictions)
 
 def AlteredEfficientNetB0(input_shape, output_shape):
-    base_model = tf.keras.applications.EfficientNetB0(weights='imagenet', include_top=False, input_shape=input_shape)
+    input_layer = Input(shape=input_shape)
     
-    x = base_model.output
+    upsampled_input = Resizing(224, 224)(input_layer)
     
-    # Add additional convolutional layers to further extract features
-    x = Conv2D(256, (3, 3), activation='relu', padding='same')(x)
-    x = BatchNormalization()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
+    base_model = tf.keras.applications.EfficientNetB0(
+        input_shape=upsampled_input.shape[1:],
+        include_top=False,
+        weights="imagenet"
+    )
+    for layer in base_model.layers:
+        layer.trainable = False
+
+    # Add new layers on top of the base model
+    x = base_model(upsampled_input)   # Use output of the base model
     
-    x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
-    x = BatchNormalization()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    
-    # Global pooling layer to reduce the dimensionality before dense layers
     x = GlobalAveragePooling2D()(x)
     
-    # First dense layer with more units and batch normalization
-    x = Dense(512, activation='relu', kernel_regularizer=l2(0.001))(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.4)(x)
+    # Optional dense layers after global pooling
+    x = Dense(1024, activation=LeakyReLU(alpha=0.1))(x)
     
-    # Second dense layer with increased units
-    x = Dense(256, activation='relu', kernel_regularizer=l2(0.001))(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.4)(x)
-    
-    # Third dense layer
-    x = Dense(128, activation='relu', kernel_regularizer=l2(0.001))(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.3)(x)
-    
-    # Output layer for classification
-    output = Dense(output_shape, activation='softmax')(x)
-    
-    # Create the final model
-    model = Model(inputs=base_model.input, outputs=output)
-    
+    # Output layer
+    x = Dense(output_shape, activation='softmax')(x)
+    # Create the new model
+    model = Model(inputs=input_layer, outputs=x)
+
     return model
 
 # only works with RGB images

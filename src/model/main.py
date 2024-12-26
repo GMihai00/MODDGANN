@@ -328,7 +328,7 @@ def main():
     parser.add_argument("--epochs", type=int, help="Number of training epochs", default=100)
     parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--train_rest_split", type=int, help="Data Split", default=0.2)
-    parser.add_argument("--model_type", type=str, help="Type of model to use. Options: \"healthy-unhealthy\"; \"pharyngitis-tonsil_disease\"; \"tonsillitis-mononucleosis\"; \"ensemble\"")
+    parser.add_argument("--model_type", type=str, help="Type of model to use. Options: \"healthy-unhealthy\"; \"pharyngitis-tonsil_disease\"; \"tonsillitis-mononucleosis\"; \"ensemble\", \"unbalanced\"")
     parser.add_argument("--training_sample", type=int, help="Number of train-test iterations", default=1)
     parser.add_argument("--number_folds", type=int, help="Number of folds for cross-validation", required=False)
     parser.add_argument("--learning_rate", type=float, help="Optimizer learning rate", default=0.001)

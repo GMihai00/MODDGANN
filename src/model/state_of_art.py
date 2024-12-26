@@ -147,22 +147,22 @@ def main():
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--input_data", type=str, help="CSV train input file")
-    parser.add_argument("--model_name", type=str, help="Model name", default="VGG16")
+    parser.add_argument("--model_name", type=str, help="Model name", default="ResNet50")
     parser.add_argument("--epochs", type=int, help="Number of training epochs", default=100)
     parser.add_argument("--batch_size", type=int, help="Batch size", default=20)
     parser.add_argument("--train_rest_split", type=int, help="Data Split", default=0.2)
-    parser.add_argument("--model_type", type=str, help="Type of model to use. Options: \"healthy-pharyngitis\"")
+    parser.add_argument("--model_type", type=str, help="Type of model to use. Options: \"healthy-pharyngitis\"", default='healthy-pharyngitis')
     parser.add_argument("--number_folds", type=int, help="Number of folds for cross-validation")
     parser.add_argument("--learning_rate", type=float, help="Optimizer learning rate", default=0.001)
     
     args = parser.parse_args()
     
-    model_name = "ResNet50"
+    model_name = args.model_name
     input_data = args.input_data
     train_epochs = args.epochs
     batch_size = args.batch_size
     train_rest_split = args.train_rest_split
-    model_type = "healthy-pharyngitis"
+    model_type = args.model_type
     learning_rate = args.learning_rate
     
     number_folds = args.number_folds

@@ -41,6 +41,14 @@ def get_disease_to_category(model_type) -> dict:
             "healthy": 0,
             "pharyngitis": 1
         }
+    elif model_type == "unbalanced":
+        return {
+            "healthy": 0,
+            "pharyngitis": 1,
+            "tonsillitis": 2,
+            "mononucleosis": 3
+        }
+        
     else:
         raise ValueError(f"Unknown training type: {model_type}")
 
