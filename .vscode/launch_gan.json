@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/src/model/gann/app.py",
             "args": [
                 "--input_data",
-                "/home/gmihai00/Repos/TenserflowModelTraining/src/dataset_helpers/data.csv",
+                "${workspaceFolder}/src/dataset_helpers/data.csv",
                 "--model_name",
                 "sample",
                 "--epochs",
