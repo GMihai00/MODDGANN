@@ -255,8 +255,6 @@ def main():
         print("No input file provided, quitting")
         exit(5)
     
-    output_file  = os.path.abspath(output_file)
-    
     if os.path.exists(input_file):
         #convert to absolute path
         input_file = os.path.abspath(input_file)
@@ -274,6 +272,8 @@ def main():
         print(f"Can't find {input_file}")
         exit(5)
     
+    output_file  = os.path.abspath(output_file)
+        
     load_classified_images(input_file)
     
     summarize_dataset()
@@ -284,6 +284,8 @@ def main():
         display_validated_data(output_file)
         
         save_data_to_csv(output_file)
+    
+    print(f"Current directory: \"{os.getcwd()}\"")
     
 if __name__ == "__main__":
     main()
