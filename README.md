@@ -54,6 +54,13 @@ Run the launch file using the vs extension. This will start training the gann fr
 python ./src/model/gann/app.py --help
 ```
 
+## State of the art model
+
+Under ".vscode" folder rename "launch_state_of_art.json" to "launch.json".
+
+Run the launch file using the vs extension. This will start training an ResNet50 trying to replicate the results from pharyngitis paper using our own dataset, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
+
+
 ## Ensemble Model
 
 Under ".vscode" folder rename "launch_model.json" to "launch.json".
