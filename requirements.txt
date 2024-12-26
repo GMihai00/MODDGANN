@@ -56,3 +56,4 @@ zipp==3.21.0
 pillow
 scikit-learn
 matplotlib
+IPython
