@@ -145,6 +145,41 @@ def InceptionV3(input_shape, output_shape):
     
     return base_model
 
+
+def ResNet50(input_shape, output_shape, freeze_layers=True):
+    input_layer = Input(shape=input_shape)
+    
+    upsampled_input = Resizing(224, 224)(input_layer)
+    
+    base_model = tf.keras.applications.ResNet50(
+        input_shape=upsampled_input.shape[1:],
+        include_top=False,
+        weights="imagenet"
+    )
+    
+    # Optionally freeze layers in the base model
+    if freeze_layers:
+        for layer in base_model.layers:
+            layer.trainable = False  # Freeze all layers in the base model
+    
+    for layer in base_model.layers[-5:]: #
+        layer.trainable = True
+    
+    # Add new layers on top of the base model
+    x = base_model(upsampled_input)  # Use output of the base model
+    x = GlobalAveragePooling2D()(x)
+    x = Dense(1024, activation=LeakyReLU(alpha=0.1))(x)
+    # x = Dropout(0.1)(x)
+    # x = Dense(512, activation=LeakyReLU(alpha=0.1))(x)
+    
+    # Output layer for classification
+    output = Dense(output_shape, activation='softmax')(x)
+    
+    # Create the new model
+    model = Model(inputs=input_layer, outputs=output)
+    
+    return model
+
 def ResNet50V2(input_shape, output_shape, freeze_layers=True):
     input_layer = Input(shape=input_shape)
     

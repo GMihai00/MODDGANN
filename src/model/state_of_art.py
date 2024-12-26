@@ -157,7 +157,7 @@ def main():
     
     args = parser.parse_args()
     
-    model_name = "AlteredInceptionV3"
+    model_name = "ResNet50"
     input_data = args.input_data
     train_epochs = args.epochs
     batch_size = args.batch_size
