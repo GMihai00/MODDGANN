@@ -126,8 +126,16 @@ def main():
     model_name = args.model_name
     buffer_size = args.buffer_size
     
+    #  need to read data beforehand due to portability issue
     try:
-        os.chdir("./src/model/gann")
+        os.chdir("./src/model")
+    except:
+        pass
+    
+    train_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
+    
+    try:
+        os.chdir("./gann")
     except:
         pass
         
@@ -137,8 +145,6 @@ def main():
     checkpoint, checkpoint_prefix = get_checkpoint(generator, discriminator, model_name)
         
     previous_epochs = read_number_from_file(EPOCHS_FILE_NAME)
-        
-    train_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
     
     train_images = (train_images - 127.5) / 127.5  # Normalize the images to [-1, 1]
     
