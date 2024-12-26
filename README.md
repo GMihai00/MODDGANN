@@ -10,9 +10,10 @@ healthy oral cavity images. The dataset used for training as well as the artific
 1. [Setting up the environment](#setting-up-the-environment)
 2. [Dataset](#dataset)
 3. [GANN](#gann)
-4. [Ensemble Model](#ensemble-model)
-5. [Visualizing training results](#visualizing-training-results)
-6. [License](#license)
+4. [State of the art model](#state-of-the-art-model)
+5. [Ensemble Model](#ensemble-model)
+6. [Visualizing training results](#visualizing-training-results)
+7. [License](#license)
 
 ## Setting up the environment
 
@@ -60,6 +61,9 @@ Under ".vscode" folder rename "launch_state_of_art.json" to "launch.json".
 
 Run the launch file using the vs extension. This will start training an ResNet50 trying to replicate the results from pharyngitis paper using our own dataset, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
 
+```ps1
+python ./src/model/state_of_art.py --help
+```
 
 ## Ensemble Model
 
