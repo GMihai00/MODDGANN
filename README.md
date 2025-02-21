@@ -29,7 +29,7 @@ Create a virtual environment
 python -m venv .vevn
 ```
 
-Actibate + install requirements
+Activate + install requirements
 
 ```ps1
 chmod +x ./bin/activate
