@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Python Script with Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/main.py",
+            "args": [
+                "--input_data",
+                "${workspaceFolder}/src/dataset_helpers/data.csv",
+                "--model_name",
+                "VGG19",
+                "--epochs",
+                "15",
+                "--model_type",
+                "tonsillitis-mononucleosis",
+                "--number_folds",
+                "5",
+                "--learning_rate",
+                "0.001",
+                "--batch_size",
+                "32"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
