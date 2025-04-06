@@ -1,0 +1,9 @@
+Path,Disease
+../../src/model/gann/final/images/image_at_epoch_0005.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0020.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0054.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0100.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0200.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0300.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0400.png,healthy
+../../src/model/gann/final/images/image_at_epoch_0500.png,healthy

@@ -123,6 +123,25 @@ def main():
     except:
         pass
         
+        
+    # real_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
+    # fake_images = read_data("../dataset_helpers/data_copy.csv", EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
+        
+    # try:
+    #     os.chdir("./gann")
+    # except:
+    #     pass
+        
+    # input_shape = (EXPECTED_FID_SIZE, EXPECTED_FID_SIZE, 3 if IS_RGB else 1)
+    
+    # model = build_InceptionV3_model(input_shape)
+    
+    # fid_score = calculate_fid_score(real_images, fake_images, model, IS_RGB)
+    
+    # print(f"FID score real vs fake images: {fid_score}")
+    
+    # # 341.98 fake against real for representative images
+    
     real_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB)
     fake_images = read_data(input_data, EXPECTED_PHOTO_HEIGHT, EXPECTED_PHOTO_WIDTH, IS_RGB, generated=True)
     
@@ -144,8 +163,8 @@ def main():
     calculate_fid_score_real_vs_fake(model, real_images, fake_images, IS_RGB)
     
     
-    # 77.87 real against real (should be around 0 normally)
-    # 341.39 fake against real
+    # # 77.87 real against real (should be around 0 normally)
+    # # 341.39 fake against real
     
 if __name__ == "__main__":
     main()
