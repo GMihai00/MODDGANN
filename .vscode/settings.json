@@ -1,8 +1,9 @@
 {
     "python.terminal.activateEnvironment": true,
     "code-runner.executorMap": {
-        "python": "source $workspaceRoot/.venv/bin/activate && python",
+        "python": "source $workspaceRoot/.env/bin/activate && python",
     },
+    "python.defaultInterpreterPath": "$workspaceRoot/.env",
     "cSpell.words": [
         "LANCZOS",
         "tensorboard",

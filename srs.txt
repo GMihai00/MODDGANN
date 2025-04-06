@@ -1,0 +1,102 @@
+User Requirements
+
+a) System Behaviour Expectations
+
+When individuals feel sick and have symptoms associated with common colds, they can self-diagnose to validate the presence of any condition specific to their oral health. To facilitate this process, they are required to use their smartphones to capture an image of their oral cavity.
+
+The model will analyze and classify the image with more than 90% certainty into one of the following categories: healthy, pharyngitis, tonsillitis, or mononucleosis. If the model’s confidence is below 90%, the results will not be taken into account, and the image will be marked as inconclusive, preventing potential misdiagnosis of patients.
+
+b) Interpretability
+
+Highlighted regions of interest in oral images that contributed to classification.
+
+Feature importance visualization (e.g., heatmaps from Grad-CAM or SHAP explanations).
+
+Confidence score of AI predictions for each detected condition.
+
+Comparison with similar past cases to provide better insights.
+
+c) User Interaction
+
+Users can opt-in to share their data for research and model improvement.
+
+Model predictions can be validated by professionals.
+
+Once data meets quality standards, it can be added to the dataset to improve performance.
+
+Functional Requirements
+
+a) Model Behaviour
+
+The ensemble model is trained on labeled data, containing images classified as healthy, pharyngitis, tonsillitis, and mononucleosis.
+
+b) Model Performance
+
+The model's performance will be evaluated using F1 score, accuracy, recall, and ROC-AUC score.
+
+Performance metrics will be obtained by randomly sampling the dataset and performing K-fold cross-validation multiple times.
+
+The final metric will be the average across all runs.
+
+F1-score and ROC-AUC score will ensure balanced classification across all conditions.
+
+c) Model Environment
+
+Data will be equally distributed per class for each model training iteration.
+
+Data
+
+a) Data Quantity
+
+The dataset contains 832 labeled images sourced from public repositories such as Roboflow, Kaggle, Google Images, and Bing Images.
+
+Additional images (382) were synthetically generated using a Generative Adversarial Neural Network (GANN).
+
+b) Data Quality
+
+Images are curated and labeled with the assistance of students from Victor Babes University of Medicine and Pharmacy Timisoara.
+
+Pre-processing includes image cropping to focus on affected areas, reducing noise.
+
+Blurry or low-resolution images are excluded from training.
+
+Each sample is evaluated by multiple professionals to ensure accurate labeling.
+
+System Quality Attributes
+
+a) Interpretability
+
+The system will use visualization tools such as Grad-CAM to highlight features that contributed to classification.
+
+b) Fairness
+
+The dataset will be balanced across all conditions to prevent model bias.
+
+Performance metrics will be analyzed across different subgroups to detect and mitigate any bias.
+
+c) Robustness
+
+The system will be tested across multiple datasets and various lighting conditions to ensure reliability.
+
+Model performance will be monitored for potential overfitting or underfitting.
+
+d) Security
+
+Data encryption and secure storage will be implemented to protect user data.
+
+Strict access control will be in place for model predictions and data usage.
+
+e) Privacy
+
+Users must provide explicit consent for data collection and storage.
+
+Anonymization techniques will be applied to remove personally identifiable information.
+
+f) Safety
+
+The system will provide clear disclaimers that it is not a substitute for professional medical advice.
+
+Inconclusive results will prompt users to seek professional consultation.
+
+Model updates will be regularly tested before deployment to prevent incorrect classifications.
+

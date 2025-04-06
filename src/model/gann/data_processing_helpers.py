@@ -43,7 +43,7 @@ def convert_image_to_bytes(image_path, expected_photo_height, expected_photo_wid
         print(f"Image {image_path} not found")
         return []  
     
-def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
+def read_data(file_path, expected_photo_height, expected_photo_width, rgb, generated=False):
     data = []
     # Open the CSV file for reading
     with open(file_path, mode='r') as file:
@@ -59,7 +59,10 @@ def read_data(file_path, expected_photo_height, expected_photo_width, rgb):
                 image_path, disease = row
                 image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
                     
-                if len(image_bytes) != 0 and disease == 'healthy':
+                directory_path = os.path.dirname(convert_path(image_path))   
+                is_generated = directory_path.endswith("gann/generated_images")
+                    
+                if len(image_bytes) != 0 and disease == 'healthy' and is_generated == generated:
                     data.append(image_bytes)
                     
     return np.array(data)

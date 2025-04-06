@@ -5,22 +5,10 @@
             "name": "Run Python Script with Args",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/model/main.py",
+            "program": "${workspaceFolder}/src/model/gann/evaluate.py",
             "args": [
                 "--input_data",
-                "${workspaceFolder}/src/dataset_helpers/data.csv",
-                "--model_name",
-                "AlteredInceptionV3",
-                "--epochs",
-                "40",
-                "--model_type",
-                "ensemble",
-                "--number_folds",
-                "5",
-                "--learning_rate",
-                "0.0008",
-                "--batch_size",
-                "16"
+                "${workspaceFolder}/src/dataset_helpers/data.csv"
             ],
             "console": "integratedTerminal"
         }

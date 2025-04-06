@@ -1,0 +1,59 @@
+TRL 0
+
+Literature Review: We researched the Literature regarding automatic detection of oral diseases. From the research we identified several 
+known diseases like pharyngitis, tonsillitis and dental caries that have proven to be effective. Given the promising results, 
+we identified multiple gaps in the literature. We proposed:
+- a model that could detect mononucleosis as well as other diseases, with the premise that similar model architectures should fit our problem
+- building a public balanced dataset composed of images of oral health diseases, to ensure an unbiased prediction.
+
+Data: No concrete, publicly available, curated dataset was to be found. On the other hand, images of the oral cavity, from patients affected by oral disease 
+are publicly available. This still leaves open the problem of appropriately labeling the data , so medical professional engagement is needed. 
+We asked for the support of students from Victor Babes, University of Medicine and Pharmacy Timisoara 
+
+TRL 1
+
+We collected data and did an initial labeling with the help on professional. At this step we didn't look into any denoising or data augmentation techniques.
+Given the collected data we ran experiments for the type of architectures we will use for our model. We mainly used model previously mentioned in the 
+state of the art like InceptionV3, ResNetV2, MobileNet, DarkNet. We used one model that would predict 4 classes and ended up with a significantly  
+low accuracy of around 70~. Improvements had to be done for both the dataset and the model architecture.
+
+
+TLR 2
+
+Data: We further collected data and curated the dataset, removing any blurred images, cropped the images on the affected region for denoising the data.
+We noticed that the dataset was unbiased, so we proposed artificially augmenting the dataset using GANs. This was done for the class with the least number 
+of samples: healthy images. 
+
+Once the image augmentation and curation steps were done, given the odd distribution of our data, we started attempting to balance it, by attempting to 
+build multiple submodules that act just like a chain of thought. We went with the most effective architecture from the previous step and run some experiments,
+with focus on measuring the F1-score and roc-auc score to validate that the model is not biased on one or multiple classes. 
+
+TLR 3
+
+Data was further curated, removing any kind of duplicates, to prevent including train data in the testing dataset. The final dataset contains 832 images.
+We tried to propose a more general testing framework, and reinforced our code. Like so, we did random sampling, with K-fold algorithm to recalculate model 
+accuracy. Also, we wrote down a framework that would allow us to properly calculate the ensemble accuracy, by chaining the training of the models.
+
+We made significant improvements to the model performance, by leveraging transfer learning techniques and slightly modifying the model architecture as well 
+ass the training methods. We added callbacks that would prevent overfilling and dynamically reduce the learning rate as well as played around with 
+weight initialization. We believe that we reached a plato, given the available dataset.
+
+
+
+TRL 4
+
+WHAT WAS DONE: 
+
+With all the prior refinements in data collection, augmentation, and model structuring, we moved towards implementing the prototype in a controlled setting. The following steps were executed:
+
+Prototype Implementation: A fully functional AI model was deployed in a controlled environment where test images were used to validate its performance.
+
+Performance Validation: The ensemble model achieved 90% accuracy, 91% precision, 90% recall, 93% ROC-AUC, and 90% F1 score.
+
+WHAT STILL NEEDS TO BE DONE:
+
+Interpretability Mechanisms: Grad-CAM heatmaps incorporated to highlight relevant regions of interest, assisting medical professionals in model interpretation.
+
+Security Measures: Data privacy protocols enforced, ensuring that only anonymized and consented user data was retained for model retraining.
+
+User Feedback Integration: A feedback mechanism integrated into the system, allowing professionals to verify model outputs and improve future predictions.
