@@ -69,6 +69,11 @@ def convert_image_to_bytes(image_path, expected_photo_height, expected_photo_wid
     
         image = Image.open(image_path)
         
+        if image.mode == 'RGBA':
+            print(f"Warning: Image {image_path} has RGBA channels. Converting to RGB.")
+            # Convert RGBA to RGB by removing the alpha channel (ignores transparency)
+            image = image.convert("RGB")
+            
         if not rgb:
             image = image.convert("L")
         

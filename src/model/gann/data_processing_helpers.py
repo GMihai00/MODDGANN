@@ -21,9 +21,14 @@ def convert_image_to_bytes(image_path, expected_photo_height, expected_photo_wid
     
         image = Image.open(image_path)
         
+        if image.mode == 'RGBA':
+            print(f"Warning: Image {image_path} has RGBA channels. Converting to RGB.")
+            # Convert RGBA to RGB by removing the alpha channel (ignores transparency)
+            image = image.convert("RGB")
+        
         if not rgb:
             image = image.convert("L")
-        
+            
         width, height = image.size
         
         if height != expected_photo_height or width != expected_photo_width:
@@ -41,6 +46,7 @@ def convert_image_to_bytes(image_path, expected_photo_height, expected_photo_wid
         
     except Exception as e:
         print(f"Image {image_path} not found")
+        print(f"Error: {e}")
         return []  
     
 def read_data(file_path, expected_photo_height, expected_photo_width, rgb, generated=False):
