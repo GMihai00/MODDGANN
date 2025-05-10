@@ -82,8 +82,32 @@ def define_model(model_type, model_name, load_weights=True, learning_rate=0.001)
     
     return model
 
-def save_model_weights(model, model_name):
-    WEIGHTS_BACKUP  = model_name + ".weights.h5"
+
+def save_model_weights(model, model_name, model_type, fold=None):
+
+    
+    if not hasattr(save_model_weights, 'call_count'):
+        save_model_weights.call_count = {}
+        
+    if model_type not in save_model_weights.call_count:
+        save_model_weights.call_count[model_type] = 0
+        
+    save_model_weights.call_count[model_type] += 1
+    
+    model_backup_dir = os.path.join("model", model_type)
+
+    os.makedirs(model_backup_dir, exist_ok=True)
+    
+    if fold != None:
+        model_backup_dir = os.path.join(model_backup_dir, f"fold_{fold}")
+        os.makedirs(model_backup_dir, exist_ok=True)
+    
+    iteration = save_model_weights.call_count[model_type]
+    
+    model_file = os.path.join(model_backup_dir, f"{model_name}: Iteration_{iteration}: Time {datetime.datetime.now().strftime('%Y.%m.%d-%H:%M:%S')}")
+
+    WEIGHTS_BACKUP  = model_file + ".weights.h5"
+    
     model.save_weights(WEIGHTS_BACKUP)
 
 def save_model(model, model_name):
@@ -234,8 +258,6 @@ def K_fold_train_ensemble_model(k, train_epochs, batch_size, learning_rate, x_tr
         
         k_fold_sub_models = K_fold_train_model(k, model_type, model_name, model_train_epochs, model_batch_size, model_learning_rate, x_train_specific, y_train_specific, x_valid_specific, y_valid_specific, x_test_specific, y_test_specific)
         
-        # save_model_weights(k_fold_sub_models, model_type)
-        
         k_fold_models.append(k_fold_sub_models)
         
         display_training_results(TRAINING_RESULTS)
@@ -269,8 +291,9 @@ def train_model(model_type, model_name, train_epochs, batch_size, learning_rate,
     
     TRAINING_RESULTS.append(ClassificationPerformanceMetrics(y_test, y_labels))
     
+    save_model_weights(model, model_name, model_type)
+        
     return model
-    # save_model_weights(model, model_name)
 
 def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, learning_rate, _x_train, _y_train, _x_valid, _y_valid, x_test, y_test, random_state=42):
     
@@ -303,6 +326,12 @@ def K_fold_train_model(k, model_type, model_name, train_epochs, batch_size, lear
         model.fit(x_fold_train, y_fold_train, epochs=train_epochs, batch_size=batch_size, shuffle=True, validation_data=(x_fold_val,  y_fold_val), callbacks=train_callbacks)
     
         results = model.evaluate(x_test,  y_test, verbose=0)
+        
+        # based on results keep track of the best performing model
+        logging.info(f"Fold {nr_fold} - Test loss: {results[0]}, Test accuracy: {results[1]}, Test precision: {results[2]}, Test recall: {results[3]}, Test auc: {results[4]}")
+        
+        
+        save_model_weights(model, model_name, model_type, nr_fold)
         
         y_pred = model.predict(x_test)
         training_results_k_fold.append(ClassificationPerformanceMetrics(y_test, y_pred))
