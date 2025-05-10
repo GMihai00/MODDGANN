@@ -36,11 +36,12 @@ def get_log_dir(model_type, model_name, fold=None):
     if not hasattr(get_log_dir, 'call_count'):
         get_log_dir.call_count = {}
         
+    if not hasattr(get_log_dir, "last_fold_nr"):
+        get_log_dir.last_fold_nr = {}
+        
     if model_type not in get_log_dir.call_count:
         get_log_dir.call_count[model_type] = 0
         
-    get_log_dir.call_count[model_type] += 1
-    
     log_dir = os.path.join("logs", model_type)
 
     os.makedirs(log_dir, exist_ok=True)
@@ -48,6 +49,15 @@ def get_log_dir(model_type, model_name, fold=None):
     if fold != None:
         log_dir = os.path.join(log_dir, f"fold_{fold}")
         os.makedirs(log_dir, exist_ok=True)
+        
+        if model_type not in get_log_dir.last_fold_nr:
+            get_log_dir.last_fold_nr[model_type] = fold
+        elif fold != get_log_dir.last_fold_nr[model_type]:
+            get_log_dir.last_fold_nr[model_type] = fold
+            get_log_dir.call_count[model_type] = 0
+        
+    get_log_dir.call_count[model_type] += 1
+        
     
     iteration = get_log_dir.call_count[model_type]
     
@@ -91,18 +101,28 @@ def save_model_weights(model, model_name, model_type, performance_metrics, fold=
     if not hasattr(save_model_weights, 'best_performing_model'):
         save_model_weights.best_performing_model = {}
         
+    if not hasattr(save_model_weights, "last_fold_nr"):
+        save_model_weights.last_fold_nr = {}
+        
     if model_type not in save_model_weights.call_count:
         save_model_weights.call_count[model_type] = 0
-        
-    save_model_weights.call_count[model_type] += 1
     
     model_backup_dir = os.path.join("model", model_type)
+
+    main_model_backup_dir = os.path.join("model", model_type)
 
     os.makedirs(model_backup_dir, exist_ok=True)
     
     if fold != None:
         model_backup_dir = os.path.join(model_backup_dir, f"fold_{fold}")
         os.makedirs(model_backup_dir, exist_ok=True)
+        if model_type not in save_model_weights.last_fold_nr:
+            save_model_weights.last_fold_nr[model_type] = fold
+        elif fold != save_model_weights.last_fold_nr[model_type]:
+            save_model_weights.last_fold_nr[model_type] = fold
+            save_model_weights.call_count[model_type] = 0
+    
+    save_model_weights.call_count[model_type] += 1
     
     iteration = save_model_weights.call_count[model_type]
     
@@ -110,16 +130,20 @@ def save_model_weights(model, model_name, model_type, performance_metrics, fold=
 
     WEIGHTS_BACKUP  = model_file + ".weights.h5"
     
-    weights_info_file = os.path.join(model_backup_dir, "best_model.txt")
+    weights_info_file = os.path.join(main_model_backup_dir, "best_model.txt")
             
     if model_type not in save_model_weights.best_performing_model:
         save_model_weights.best_performing_model[model_type] = (performance_metrics, WEIGHTS_BACKUP)
         with open(weights_info_file, "w") as file:
             file.write(WEIGHTS_BACKUP)
+            file.write("\n")
+            file.write(str(performance_metrics))
     elif performance_metrics > save_model_weights.best_performing_model[model_type][0]:
         save_model_weights.best_performing_model[model_type] = (performance_metrics, WEIGHTS_BACKUP)
         with open(weights_info_file, "w") as file:
             file.write(WEIGHTS_BACKUP)
+            file.write("\n")
+            file.write(str(performance_metrics))
             
     if os.path.exists(WEIGHTS_BACKUP):
         os.remove(WEIGHTS_BACKUP)
