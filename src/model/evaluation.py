@@ -146,4 +146,5 @@ def display_training_results(training_results: List[ClassificationPerformanceMet
     
     logging.info(f"Average training results:\n {str(average_metrics)}")
     
+    # to disable in case running in non interactive mode, this will wait for user to close the plot
     average_metrics.plot_roc_curve()
