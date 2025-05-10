@@ -53,6 +53,45 @@ class ClassificationPerformanceMetrics:
             plt.grid(alpha=0.3)
             plt.show()
 
+    def __eq__(self, other):
+        if not isinstance(other, ClassificationPerformanceMetrics):
+            return False
+        return (
+            np.isclose(self.accuracy, other.accuracy) and
+            np.isclose(self.precision, other.precision) and
+            np.isclose(self.recall, other.recall) and
+            np.isclose(self.f1_score, other.f1_score) and
+            np.isclose(self.roc_auc_score, other.roc_auc_score)
+        )
+
+    def __lt__(self, other):
+        if not isinstance(other, ClassificationPerformanceMetrics):
+            return NotImplemented
+        
+        if not np.isclose(self.f1_score, other.f1_score):
+            return self.f1_score < other.f1_score
+        if not np.isclose(self.roc_auc_score, other.roc_auc_score):
+            return self.roc_auc_score < other.roc_auc_score
+        if not np.isclose(self.accuracy, other.accuracy):
+            return self.accuracy < other.accuracy
+        if not np.isclose(self.recall, other.recall):
+            return self.recall < other.recall
+        return False
+
+    def __gt__(self, other):
+        if not isinstance(other, ClassificationPerformanceMetrics):
+            return NotImplemented
+        
+        if not np.isclose(self.f1_score, other.f1_score):
+            return self.f1_score > other.f1_score
+        if not np.isclose(self.roc_auc_score, other.roc_auc_score):
+            return self.roc_auc_score > other.roc_auc_score
+        if not np.isclose(self.accuracy, other.accuracy):
+            return self.accuracy > other.accuracy
+        if not np.isclose(self.recall, other.recall):
+            return self.recall > other.recall
+        return False
+
     def __str__(self):
         result = (
             f"Accuracy: {self.accuracy:.4f}\n"
