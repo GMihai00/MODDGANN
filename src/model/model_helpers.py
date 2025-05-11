@@ -61,7 +61,7 @@ def define_model(model_type, model_name, learning_rate=0.001, weights_file=None)
 
             if os.path.isfile(best_model_file):
                 with open(best_model_file, "r") as file:
-                    weights_file_path = os.path.join(os.curdir, file.readline())
+                    weights_file_path = os.path.join(os.curdir, file.readline().strip())
                     if os.path.isfile(weights_file_path):
                         model.load_weights(weights_file_path)
                     else:

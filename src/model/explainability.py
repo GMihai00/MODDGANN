@@ -164,7 +164,7 @@ def main():
         if data["model_type"] == model_type:
             model_name = data["model_name"]
             learning_rate = data["learning_rate"]
-            model = define_model(model_type, model_name, learning_rate=learning_rate)
+            model = define_model(model_type, model_name, learning_rate=learning_rate, weights_file="BEST")
             break
     
     if model is None:
@@ -185,7 +185,7 @@ def main():
     
     heatmap = make_cam_heatmap(img_array, model, last_conv_layer_name="mixed10")
     
-    save_and_display_gradcam(img_path, heatmap)
+    save_and_display_gradcam(img_path, heatmap, cam_path = model_type + "_cam.jpg")
 
 if __name__ == "__main__":
     main()
