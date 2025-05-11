@@ -1,7 +1,7 @@
 from data_processing_helpers import *
 
 import models
-
+import datetime
 import subprocess
 
 from evaluation import *
@@ -105,7 +105,7 @@ def save_model_weights(model, model_name, model_type, performance_metrics, fold=
     
     iteration = save_model_weights.call_count[model_type]
     
-    model_file = os.path.join(model_backup_dir, f"{model_name}: Iteration_{iteration}: Time {datetime.datetime.now().strftime('%Y.%m.%d-%H:%M:%S')}")
+    model_file = os.path.join(model_backup_dir, f"{model_name}:_Iteration_{iteration}:_Time_{datetime.datetime.now().strftime('%Y.%m.%d-%H:%M:%S')}")
 
     WEIGHTS_BACKUP  = model_file + ".weights.h5"
     
