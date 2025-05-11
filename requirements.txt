@@ -57,3 +57,4 @@ pillow
 scikit-learn
 matplotlib
 IPython
+opencv-python
