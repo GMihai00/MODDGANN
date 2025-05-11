@@ -16,8 +16,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # to disable cuda
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-
 import tensorflow as tf
 
 from training_callbacks import ImagePredictionLogger

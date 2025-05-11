@@ -5,6 +5,7 @@ from tensorflow.keras.layers import Dense, Dropout,Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.layers import LeakyReLU
 
+
 def NASNetMobile(input_shape, output_shape):
     base_model = tf.keras.applications.NASNetMobile(input_shape = input_shape, include_top = True, weights = None, classes = output_shape, classifier_activation='softmax')
     
