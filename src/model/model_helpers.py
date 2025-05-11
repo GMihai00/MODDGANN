@@ -52,8 +52,22 @@ def define_model(model_type, model_name, learning_rate=0.001, weights_file=None)
         ]
     )
     
-    if weights_file and os.path.isfile(weights_file):
-        model.load_weights(weights_file)
+    if weights_file:
+        if os.path.isfile(weights_file):
+            model.load_weights(weights_file)
+        elif weights_file == "BEST":
+            
+            best_model_file = os.path.join(os.curdir, "model", model_type, "best_model.txt")
+
+            if os.path.isfile(best_model_file):
+                with open(best_model_file, "r") as file:
+                    weights_file_path = os.path.join(os.curdir, file.readline())
+                    if os.path.isfile(weights_file_path):
+                        model.load_weights(weights_file_path)
+                    else:
+                        raise FileNotFoundError(f"Weights file not found: {weights_file_path}")
+            else:
+                raise FileNotFoundError(f"Best model file not found: {best_model_file}")
     
     return model
 

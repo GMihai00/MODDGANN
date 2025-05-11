@@ -69,7 +69,7 @@ def AlteredInceptionV3(input_shape, output_shape):
     x = GlobalAveragePooling2D()(x)
     
     # Optional dense layers after global pooling
-    x = Dense(1024, activation=LeakyReLU(alpha=0.1))(x)
+    x = Dense(2048, activation=LeakyReLU(alpha=0.1))(x)
     
     # Output layer
     x = Dense(output_shape, activation='softmax')(x)

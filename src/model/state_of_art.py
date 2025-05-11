@@ -8,7 +8,6 @@ logging.basicConfig(
 
 import argparse
 import os
-import subprocess
 import datetime
 import time
 
