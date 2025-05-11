@@ -5,6 +5,7 @@ import models
 import subprocess
 
 from evaluation import *
+import tensorflow as tf
 
 MODEL_LAYERS = [
     {
