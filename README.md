@@ -1,4 +1,4 @@
-# Mononucleosis oral disease detection with the help of GANNs 
+# Mononucleosis oral disease detection with the help of GANNs
 
 Publication link: https://link.springer.com/chapter/10.1007/978-981-96-5884-8_14
 
@@ -49,7 +49,7 @@ As for the labeling, a csv with the labels can be found under "src/dataset_helpe
 
 ## GANN
 
-Under ".vscode" folder rename "launch_gan.json" to "launch.json". 
+Under ".vscode" folder rename "launch_gan.json" to "launch.json".
 
 Run the launch file using the vs extension. This will start training the gann from scratch, running 10000 epochs, using a batch size of 400. You can change this paramaeters, please run the following command for further assistence
 
@@ -91,3 +91,5 @@ To view the results that the authors achieved please run
 ```ps1
 tensorboard --logdir ./src/model/final_result_logs
 ```
+
+The best weights obtained during the experiments can be found inside archive ./src/model/best_weights.tar.gz
