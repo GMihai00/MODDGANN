@@ -1,0 +1,6 @@
+model/tonsillitis-mononucleosis/fold_4/AlteredInceptionV3:_Iteration_1:_Time_2025.05.11-22:26:07.weights.h5
+Accuracy: 0.7778
+Precision: 0.8083
+Recall: 0.7778
+F1 Score: 0.7835
+ROC AUC Score: 0.7917

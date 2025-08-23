@@ -167,7 +167,7 @@ env
 saved_model
 
 src/model/logs/*
-*.weights.h5
+src/model/model/*.weights.h5
 
 src/model/gann/training_checkpoints
 src/model/gann/images

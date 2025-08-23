@@ -50,10 +50,6 @@ Prototype Implementation: A fully functional AI model was deployed in a controll
 
 Performance Validation: The ensemble model achieved 90% accuracy, 91% precision, 90% recall, 93% ROC-AUC, and 90% F1 score.
 
-WHAT STILL NEEDS TO BE DONE:
+Interpretability Mechanisms: CAM heatmaps incorporated to highlight relevant regions of interest, assisting medical professionals in model interpretation.
 
-Interpretability Mechanisms: Grad-CAM heatmaps incorporated to highlight relevant regions of interest, assisting medical professionals in model interpretation.
-
-Security Measures: Data privacy protocols enforced, ensuring that only anonymized and consented user data was retained for model retraining.
-
-User Feedback Integration: A feedback mechanism integrated into the system, allowing professionals to verify model outputs and improve future predictions.
+User Feedback Integration: A feedback mechanism integrated into the system by using tensorboard callbacks, allowing professionals to verify model outputs and improve future predictions.
