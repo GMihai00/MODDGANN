@@ -1,6 +1,15 @@
-from .data_processing_helpers import *
 
-from . import models
+import os, sys
+
+sys.path.insert(0, os.path.dirname(__file__))
+
+try:
+    from .data_processing_helpers import *
+    from . import models
+except Exception:
+    from data_processing_helpers import *
+    import models
+
 import datetime
 import subprocess
 

@@ -14,7 +14,15 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
 
-from .model_helpers import *
+import os, sys
+
+# allow running this module directly (python explainability.py) while keeping package-style imports
+sys.path.insert(0, os.path.dirname(__file__))
+
+try:
+    from .model_helpers import *
+except Exception:
+    from model_helpers import *
 
 import numpy as np
 import matplotlib.pyplot as plt
