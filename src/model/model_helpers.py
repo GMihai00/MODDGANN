@@ -1,10 +1,10 @@
-from data_processing_helpers import *
+from .data_processing_helpers import *
 
 import models
 import datetime
 import subprocess
 
-from evaluation import *
+from .evaluation import *
 import tensorflow as tf
 
 MODEL_LAYERS = [

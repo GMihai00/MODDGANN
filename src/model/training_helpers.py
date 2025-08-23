@@ -1,12 +1,12 @@
-from data_processing_helpers import *
-from model_helpers import *
-from evaluation import *
+from .data_processing_helpers import *
+from .model_helpers import *
+from .evaluation import *
 
 import datetime
 
 import tensorflow as tf
 
-from training_callbacks import ImagePredictionLogger
+from .training_callbacks import ImagePredictionLogger
 
 
 from sklearn.model_selection import StratifiedKFold
