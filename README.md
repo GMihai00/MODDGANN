@@ -1,4 +1,6 @@
-# Mononucleosis oral disease detection with the help of GANNs
+# Mononucleosis oral disease detection with the help of GANNs 
+
+Publication link: https://link.springer.com/chapter/10.1007/978-981-96-5884-8_14
 
 ## Abstract
 
