@@ -167,7 +167,9 @@ env
 saved_model
 
 src/model/logs/*
-src/model/model/*.weights.h5
+src/model/model/healthy-unhealthy/*.weights.h5
+src/model/model/pharyngitis-tonsil_disease/*.weights.h5
+src/model/model/tonsillitis-mononucleosis/*.weights.h5
 
 src/model/gann/training_checkpoints
 src/model/gann/images
