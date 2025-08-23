@@ -1,6 +1,6 @@
 from .data_processing_helpers import *
 
-import models
+from .models import *
 import datetime
 import subprocess
 
