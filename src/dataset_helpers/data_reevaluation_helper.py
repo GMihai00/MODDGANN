@@ -115,49 +115,50 @@ def center_window(root, photo_height, photo_width):
     # Set the window geometry
     root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
     
-def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
+def display_image_and_wait_for_choice(file_path, initial_disease, initial_diagnosis, output_file):
     # Check if the image file exists
-    
-    if initial_disease != "tonsillitis" and initial_disease != "mononucleosis":
-        return
-    
     if os.path.exists(file_path):
 
         file_path = os.path.abspath(file_path)
-        
+
         if file_path in validated_images:
             print(f"File {file_path} already validated")
             return
-        
+
         print(file_path)
         img = Image.open(file_path)
         img = img.resize((500, 500))
-        
+
         root = tk.Tk()
         root.title("Image Viewer")
 
         img_tk = ImageTk.PhotoImage(img)
-        
+
         center_window(root, 500, 500)
-    
+
         label = tk.Label(root, image=img_tk)
         label.pack()
-        
+
         text_label = tk.Label(root, text=f"Classified before as: {initial_disease}",  font=("Helvetica", 20))
         text_label.pack()
-        
+
         def on_button_click(option, file_path, initial_disease):
             print(f"Option {option} selected")
-            
+
+            # Extract the text from the diagnosis entry
+            diagnosis_text = diagnosis_textbox.get("1.0", tk.END).strip()
+            print(f"Diagnosis entered: {diagnosis_text}")
+
             if option == "quit":
+                root.destroy()
                 save_data_to_csv(output_file)
                 exit(0)
 
             if option != "remove":
                 if option != "OK":
-                    image_to_disease_data.append([file_path, option, "NAN"])
+                    image_to_disease_data.append([file_path, option, diagnosis_text])
                 else:
-                    image_to_disease_data.append([file_path, initial_disease, "NAN"])
+                    image_to_disease_data.append([file_path, initial_disease, diagnosis_text])
             else:
                 try:
                     os.remove(file_path)
@@ -165,7 +166,7 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
                     print(f"Error deleting '{file_path}': {e}")
 
             root.destroy()  # Close the tkinter window when an option is selected
-    
+
         button_width = 40  # Adjust the button width
         button_height = 1  # Adjust the button height
 
@@ -176,7 +177,15 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
                 height=button_height,
                 command=lambda option=option, file_path=file_path, initial_disease=initial_disease: on_button_click(option, file_path, initial_disease))
             button.pack()
-    
+
+        # Add a label and larger text box for diagnosis input below the buttons
+        diagnosis_label = tk.Label(root, text="Diagnosis:", font=("Helvetica", 14))
+        diagnosis_label.pack()
+
+        diagnosis_textbox = tk.Text(root, height=5, width=50)  # Larger text box with 5 rows height
+        diagnosis_textbox.insert("1.0", initial_diagnosis) 
+        diagnosis_textbox.pack()
+
         # Start the tkinter main loop to display the image and buttons
         root.mainloop()
     else:
@@ -192,9 +201,9 @@ def summarize_dataset():
     print(f"Total: {total} images")
 
 def display_validated_data(output_file):
-    for key, value, diagnosis in old_image_to_disease_data:
+    for image_path, disease, diagnosis in old_image_to_disease_data:
         # image_to_disease_data.append([key, value]) to just remove missing files 
-        display_image_and_wait_for_choice(key, value, output_file);
+        display_image_and_wait_for_choice(image_path, disease, diagnosis, output_file);
 
 
 def remove_duplicates(input_path):
