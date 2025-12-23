@@ -156,23 +156,24 @@ def read_data(model_type, file_path, expected_photo_height, expected_photo_width
         next(reader, None)
         
         for row in reader:
-            if len(row) == 2:  # Ensure there are two columns in the row
-                image_path, disease = row
-                image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
+            image_path = row.get('Path')
+            disease = row.get('Disease')
+            
+            image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
+            
+            disease = convert_disease_label(model_type, disease)
+            
+            if len(image_bytes) == 0:
+                if not os.path.exists(f'errs.txt'):
+                    with open(f'errs.txt', 'w') as file:
+                        file.write(f"{image_path}\n")
+                else:
+                    with open('errs.txt', 'a') as file:
+                        file.write(f"{image_path}\n")
+            
+            if len(image_bytes) != 0 and disease != None:
+                data[disease].append(image_bytes)
                 
-                disease = convert_disease_label(model_type, disease)
-                
-                if len(image_bytes) == 0:
-                    if not os.path.exists(f'errs.txt'):
-                        with open(f'errs.txt', 'w') as file:
-                            file.write(f"{image_path}\n")
-                    else:
-                        with open('errs.txt', 'a') as file:
-                            file.write(f"{image_path}\n")
-                
-                if len(image_bytes) != 0 and disease != None:
-                    data[disease].append(image_bytes)
-                    
     for key, value in data.items():
         data[key] = np.array(value)
         logging.info(f"{key}: {len(data[key])}")
