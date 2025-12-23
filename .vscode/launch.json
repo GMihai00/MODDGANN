@@ -93,17 +93,6 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Start GAN Evaluation",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/model/gann/evaluate.py",
-            "args": [
-                "--input_data",
-                "${workspaceFolder}/src/dataset_helpers/data.csv"
-            ],
-            "console": "integratedTerminal"
-        },
-        {
             "name": "Start Model explainability",
             "type": "debugpy",
             "request": "launch",
