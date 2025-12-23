@@ -1,0 +1,118 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Reevaluate Dataset",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dataset_helpers/data_reevaluation_helper.py",
+            "args": [
+                "--input",
+                "${workspaceFolder}/src/dataset_helpers/data.csv"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start State-of-the-Art Model Training",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/state_of_art.py",
+            "args": [
+                "--input_data",
+                "${workspaceFolder}/src/dataset_helpers/data.csv",
+                "--epochs",
+                "40",
+                "--number_folds",
+                "5",
+                "--learning_rate", 
+                "0.00005"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start Model Training",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/main.py",
+            "args": [
+                "--input_data",
+                "${workspaceFolder}/src/dataset_helpers/data.csv",
+                "--model_name",
+                "AlteredTLInceptionV3",
+                "--epochs",
+                "15",
+                "--model_type",
+                "ensemble",
+                "--number_folds",
+                "5",
+                "--learning_rate",
+                "0.001",
+                "--batch_size",
+                "32"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start Image Generation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/gann/generate_images.py",
+            "args": [
+                "--model_name",
+                "sample"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start GAN Training",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/gann/app.py",
+            "args": [
+                "--input_data",
+                "${workspaceFolder}/src/dataset_helpers/data.csv",
+                "--model_name",
+                "sample",
+                "--epochs",
+                "10000",
+                "--batch_size",
+                "400"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start GAN Evaluation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/gann/evaluate.py",
+            "args": [
+                "--input_data",
+                "${workspaceFolder}/src/dataset_helpers/data.csv"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start GAN Evaluation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/gann/evaluate.py",
+            "args": [
+                "--input_data",
+                "${workspaceFolder}/src/dataset_helpers/data.csv"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Start Model explainability",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/model/explainability.py",
+            "args": [
+                "--model_type",
+                "healthy-unhealthy"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

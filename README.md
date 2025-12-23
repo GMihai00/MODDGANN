@@ -9,13 +9,15 @@ healthy oral cavity images. The dataset used for training as well as the artific
 
 # Table of content
 
-1. [Setting up the environment](#setting-up-the-environment)
-2. [Dataset](#dataset)
-3. [GANN](#gann)
-4. [State of the art model](#state-of-the-art-model)
-5. [Ensemble Model](#ensemble-model)
-6. [Visualizing training results](#visualizing-training-results)
-7. [License](#license)
+- [Mononucleosis oral disease detection with the help of GANNs](#mononucleosis-oral-disease-detection-with-the-help-of-ganns)
+  - [Abstract](#abstract)
+- [Table of content](#table-of-content)
+  - [Setting up the environment](#setting-up-the-environment)
+  - [Dataset](#dataset)
+  - [GANN](#gann)
+  - [State of the art model](#state-of-the-art-model)
+  - [Ensemble Model](#ensemble-model)
+  - [Visualizing training results](#visualizing-training-results)
 
 ## Setting up the environment
 
@@ -49,9 +51,7 @@ As for the labeling, a csv with the labels can be found under "src/dataset_helpe
 
 ## GANN
 
-Under ".vscode" folder rename "launch_gan.json" to "launch.json".
-
-Run the launch file using the vs extension. This will start training the gann from scratch, running 10000 epochs, using a batch size of 400. You can change this paramaeters, please run the following command for further assistence
+Run the launch file config 'Start GAN Training' using the vs extension. This will start training the gann from scratch, running 10000 epochs, using a batch size of 400. You can change this paramaeters, please run the following command for further assistence
 
 ```ps1
 python ./src/model/gann/app.py --help
@@ -59,9 +59,7 @@ python ./src/model/gann/app.py --help
 
 ## State of the art model
 
-Under ".vscode" folder rename "launch_state_of_art.json" to "launch.json".
-
-Run the launch file using the vs extension. This will start training an ResNet50 trying to replicate the results from pharyngitis paper using our own dataset, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
+Run the launch file config 'Start State-of-the-Art Model Training' using the vs extension. This will start training an ResNet50 trying to replicate the results from pharyngitis paper using our own dataset, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
 
 ```ps1
 python ./src/model/state_of_art.py --help
@@ -69,9 +67,7 @@ python ./src/model/state_of_art.py --help
 
 ## Ensemble Model
 
-Under ".vscode" folder rename "launch_model.json" to "launch.json".
-
-Run the launch file using the vs extension. This will start training the ensemble from scrath, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
+Run the launch file config 'Start Model Training' using the vs extension. This will start training the ensemble from scrath, doing 5-fold for validation and outputing tensorboard logs to a newly created "logs" folder. You can change this paramaeters, please run the following command for further assistence
 
 ```ps1
 python ./src/model/main.py --help
