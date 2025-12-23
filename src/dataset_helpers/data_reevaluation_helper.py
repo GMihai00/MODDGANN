@@ -37,10 +37,10 @@ def load_already_validated_images(csv_file_path):
                 validated_images.add(row[0])
                 
             if cnt == 0:
-                image_to_disease_data.append(["Path", "Disease"])
+                image_to_disease_data.append(["Path", "Disease", "Diagnosis"])
     except FileNotFoundError:
         print(f"The file {csv_file_path} does not exist, creating it")
-        image_to_disease_data.append(["Path", "Disease"])
+        image_to_disease_data.append(["Path", "Disease", "Diagnosis"])
         with open(csv_file_path, mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
 
@@ -81,19 +81,20 @@ def convert_image_to_bytes(image_path, expected_photo_height = 160, expected_pho
 def load_classified_images(csv_file_path):
     try:
         with open(csv_file_path, 'r') as file:
-            csv_reader = csv.reader(file)
+            csv_reader = csv.DictReader(file)
             # skip column definition row
             next(csv_reader) 
             for row in csv_reader:
-                if len(row) == 2:
+                image_path = row['Path']
+                disease = row['Disease']
                 # Assuming the first column contains the values you want to insert into the set
-                    image_path, disease = row
-                    image_bytes = convert_image_to_bytes(convert_path(image_path))
-                        
-                    if len(image_bytes) != 0 and (disease in image_per_disease.keys()):
-                        
-                        old_image_to_disease_data.append([convert_path(image_path), disease])
-                        image_per_disease[disease]+=1
+                diagnosis = row['Diagnosis'] if 'Diagnosis' in row else "NAN"
+                image_bytes = convert_image_to_bytes(convert_path(image_path))
+                    
+                if len(image_bytes) != 0 and (disease in image_per_disease.keys()):
+                    
+                    old_image_to_disease_data.append([convert_path(image_path), disease, diagnosis])
+                    image_per_disease[disease]+=1
 
     except Exception as err:
         print(err)
@@ -154,9 +155,9 @@ def display_image_and_wait_for_choice(file_path, initial_disease, output_file):
 
             if option != "remove":
                 if option != "OK":
-                    image_to_disease_data.append([file_path, option])
+                    image_to_disease_data.append([file_path, option, "NAN"])
                 else:
-                    image_to_disease_data.append([file_path, initial_disease])
+                    image_to_disease_data.append([file_path, initial_disease, "NAN"])
             else:
                 try:
                     os.remove(file_path)
@@ -191,7 +192,7 @@ def summarize_dataset():
     print(f"Total: {total} images")
 
 def display_validated_data(output_file):
-    for key, value in old_image_to_disease_data:
+    for key, value, diagnosis in old_image_to_disease_data:
         # image_to_disease_data.append([key, value]) to just remove missing files 
         display_image_and_wait_for_choice(key, value, output_file);
 

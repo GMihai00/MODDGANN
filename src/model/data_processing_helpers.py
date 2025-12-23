@@ -151,13 +151,13 @@ def read_data(model_type, file_path, expected_photo_height, expected_photo_width
         data[disease] = []
     
     with open(file_path, mode='r') as file:
-        reader = csv.reader(file)
+        reader = csv.DictReader(file)
         
         next(reader, None)
         
         for row in reader:
-            image_path = row.get('Path')
-            disease = row.get('Disease')
+            image_path = row['Path']
+            disease = row['Disease']
             
             image_bytes = convert_image_to_bytes(convert_path(image_path), expected_photo_height, expected_photo_width, rgb)
             

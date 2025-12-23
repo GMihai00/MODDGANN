@@ -11,6 +11,7 @@
                 "${workspaceFolder}/src/dataset_helpers/data.csv"
             ],
             "cwd": "${workspaceFolder}",
+            "python": "${command:python.interpreterPath}",
             "console": "integratedTerminal"
         },
         {
