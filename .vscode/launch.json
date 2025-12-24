@@ -15,6 +15,21 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Evaluate VLM Dataset",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dataset_helpers/data_reevaluation_helper.py",
+            "args": [
+                "--input",
+                "${workspaceFolder}/src/dataset_helpers/data_with_vlm_diagnosis.csv",
+                "--output",
+                "${workspaceFolder}/src/dataset_helpers/data_with_vlm_evaluate.csv",
+            ],
+            "cwd": "${workspaceFolder}",
+            "python": "${command:python.interpreterPath}",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Start State-of-the-Art Model Training",
             "type": "debugpy",
             "request": "launch",
