@@ -5,6 +5,7 @@ import tkinter as tk
 import csv
 import argparse
 import numpy as np
+import textwrap
 
 #python -u "e:\Projects\TenserflowModelTraining\data_filter_helper.py" --input ./bucal_cavity_diseases_dataset/train/1/_annotations.coco.json --output E:\Projects\TenserflowModelTraining\data.csv
 DISEASES_TYPES = ["OK", "pharyngitis", "tonsillitis", "mononucleosis", "healthy", "quit", "remove"]
@@ -138,7 +139,7 @@ def display_image_and_wait_for_choice(file_path, initial_disease, initial_diagno
 
         label = tk.Label(root, image=img_tk)
         label.pack()
-
+        
         text_label = tk.Label(root, text=f"Classified before as: {initial_disease}",  font=("Helvetica", 20))
         text_label.pack()
 
@@ -185,7 +186,15 @@ def display_image_and_wait_for_choice(file_path, initial_disease, initial_diagno
         diagnosis_textbox = tk.Text(root, height=5, width=50)  # Larger text box with 5 rows height
         diagnosis_textbox.insert("1.0", initial_diagnosis) 
         diagnosis_textbox.pack()
-
+                
+        wrapped_path = "\n".join(textwrap.wrap(file_path, width=50))  # Adjust width as needed
+        path_label = tk.Label(
+            root, 
+            text=f"ImagePath:\n{wrapped_path}", 
+            font=("Helvetica", 14)
+        )
+        path_label.pack() 
+        
         # Start the tkinter main loop to display the image and buttons
         root.mainloop()
     else:
@@ -238,7 +247,7 @@ def save_data_to_csv(csv_file_path):
             csv_writer = csv.writer(csv_file)
         
             if not existed_before:
-                csv_writer.writerow(["Path", "Disease"])
+                csv_writer.writerow(["Path", "Disease", "Diagnosis"])
                 
             csv_writer.writerows(image_to_disease_data)
         
