@@ -118,6 +118,8 @@ def center_window(root, photo_height, photo_width):
     
 def display_image_and_wait_for_choice(file_path, initial_disease, initial_diagnosis, output_file):
     # Check if the image file exists
+    initial_diagnosis = sanitize_diagnosis(initial_diagnosis)
+    
     if os.path.exists(file_path):
 
         file_path = os.path.abspath(file_path)
@@ -258,6 +260,14 @@ def save_data_to_csv(csv_file_path):
 
 def remove_invalid_entries(output_file):
     pass
+
+def sanitize_diagnosis(diagnosis):
+    diagnosis = diagnosis.replace("*", "")
+    diagnosis = diagnosis.replace("Diagnosis:", "Diagnosis is")
+    diagnosis = diagnosis.replace("diagnosis:", "diagnosis is")
+    diagnosis = diagnosis.replace("\n\n", "\n")
+    diagnosis = diagnosis.replace("Description: ", "")
+    return diagnosis
 
 def main():
     parser = argparse.ArgumentParser()
